@@ -1,0 +1,35 @@
+{
+    "name": "netgroup/datatransformationlayer",
+    "description": "Es handelt sich um eine Erweiterung für das Open Source CMS Contao",
+    "license": "Apache-2.0",
+    "type": "contao-bundle",
+    "authors": [
+        {
+            "name": "NetGroup GmbH",
+            "email": "info@netgroup.de",
+            "homepage": "http://www.netgroup.de",
+            "role": "Developer"
+        }
+    ],
+    "support": {
+        "email": "info@netgroup.de"
+    },
+    "require": {
+        "php": "^8.2",
+        "contao/core-bundle": "^5.3",
+        "netgroup/contaotoolkit": "^2.1"
+    },
+    "require-dev": {
+        "contao/test-case": "^5.3",
+        "phpunit/phpunit": "^9.6",
+        "roave/security-advisories": "dev-master"
+    },
+    "autoload": {
+        "psr-4": {
+            "NetGroup\\DataTransformationLayer\\": ""
+        }
+    },
+    "extra": {
+        "contao-manager-plugin": "NetGroup\\DataTransformationLayer\\Classes\\Contao\\Manager\\Plugin"
+    }
+}

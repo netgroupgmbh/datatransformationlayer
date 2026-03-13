@@ -1,0 +1,10 @@
+parameters:
+    level: 9
+    bootstrapFiles:
+        - ../../../../vendor/autoload.php
+    paths:
+        - ../Classes
+    ignoreErrors:
+        - '#^Cannot call method load\(\) on Symfony\\Component\\Config\\Loader\\LoaderInterface*#'
+    excludePaths:
+        - ../Classes/Contao/Elements/*

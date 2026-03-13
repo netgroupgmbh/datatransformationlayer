@@ -1,0 +1,12 @@
+# .gitignore by NetGroup GmbH
+# ===========================
+# author      Patrick Froch <p.froch@netgroup.de>
+# link        http://www.netgroup.de
+# copyright   NetGroup GmbH 2024
+# since       01.08.2024 - 10:00
+
+*.cache
+autoload*
+.phpversion
+vendor/
+.idea/
