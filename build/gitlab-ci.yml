@@ -16,7 +16,7 @@ test_cto5.3_php8.3:
             when: never
         -   if: $CI_COMMIT_BRANCH == "/dev-*/"
             when: never
-    image: registry.netgroup.de/testsuite_cto5.3_php8.3:1.0.1
+    image: registry.netgroup.de/testsuite_cto5.3_php8.2:2.0.0
     variables:
         GIT_STRATEGY: none
         PROJECT_NAME: netgroup/datatransformationlayer
