@@ -10,3 +10,4 @@ autoload*
 .phpversion
 vendor/
 .idea/
+build/rulesets.xml

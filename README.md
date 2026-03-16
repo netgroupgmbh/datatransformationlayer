@@ -1,7 +1,7 @@
 # Data Transformation Layer
 
 [![Lizenz](https://img.shields.io/badge/Lizenz-Apache--2.0-blue.svg)](LICENSE)
-![PHP](https://img.shields.io/badge/PHP-%5E8.2-777bb4.svg)
+![PHP](https://img.shields.io/badge/PHP-%5E8.3-777bb4.svg)
 ![Contao](https://img.shields.io/badge/Contao-%5E5.3-ea5d0b.svg)
 
 Eine schlanke **Data Transformation Layer** für Contao-Bundles: Du definierst **Projections** (ausgabespezifische Feld-Transformationen) und wendest sie effizient auf große DBAL-Resultsets an – inklusive **Prefetching**, um N+1-Queries zu vermeiden.
@@ -71,7 +71,7 @@ Dadurch bleiben DBAL-Queries sauber, Ausgabelogik ist explizit und wiederverwend
 
 ## Voraussetzungen
 
-- PHP: `^8.2`
+- PHP: `^8.3`
 - Contao: `contao/core-bundle ^5.3`
 
 ---
