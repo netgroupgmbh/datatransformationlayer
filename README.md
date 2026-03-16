@@ -150,15 +150,9 @@ final class MemberListProjection implements ProjectionInterface
 
     public function build(ProjectionPlanBuilder $builder): void
     {
-        $builder
-            ->field('tstamp')
-                ->pipe(DateTimeFormatConverter::class, ['format' => 'd.m.Y H:i'])
-            ->end()
-
-            ->field('id')
-                ->pipe(MemberFullnameConverter::class)
-            ->end()
-        ;
+        $builder->field(OrderListField::CreatedAt)
+                //->convert(TrimConverter::class) // mehrere Konvertierungsschritte möglich!
+                ->convert(DateTimeFormatConverter::class, ['format' => 'd.m.Y H:i']);
     }
 }
 ```

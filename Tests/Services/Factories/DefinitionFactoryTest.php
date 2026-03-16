@@ -37,6 +37,24 @@ class DefinitionFactoryTest extends TestCase
 
 
     /**
+     * Testet, dass `createConversionContext()` eine Instanz von `ConversionContext` zurückgibt,
+     * bei der der Projection-Klassenname korrekt gesetzt ist.
+     */
+    public function testCreateConversionContext(): void
+    {
+        // Anordnen
+        $projection = 'SomeConverter';
+        $options    = ['key' => 'value', 'number' => 42];
+
+        // Ausführen
+        $result = $this->factory->createConversionContext($projection, $options);
+
+        // Assert
+        $this->assertSame($projection, $result->projection);
+    }
+
+
+    /**
      * Testet, dass `createConversionStep()` eine Instanz von `ConversionStep` zurückgibt,
      * bei der der Converter-Klassenname korrekt gesetzt ist.
      */
