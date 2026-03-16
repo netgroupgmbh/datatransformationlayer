@@ -102,12 +102,12 @@ services:
 
   # --- Converter ---
   App\Conversion\Converter\:
-    resource: '../src/Conversion/Converter/*'
+    resource: '../../Classes/Conversion/Converter/*'
     tags: ['netgroup.datatransformation.converter']
 
   # --- Projections ---
   App\Conversion\Projection\:
-    resource: '../src/Conversion/Projection/*'
+    resource: '../../Classes/Conversion/Projection/*'
     tags: ['netgroup.datatransformation.projection']
 ```
 

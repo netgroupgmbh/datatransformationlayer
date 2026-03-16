@@ -4,23 +4,13 @@ services:
         autowire: true
         autoconfigure: true
 
-#    # Converter automatisch registrieren
-#    NetGroup\DataTransformationLayer\Classes\Services\Converter\:
-#        resource: '../../Classes/Services/Converter/'
-#        tags: [ 'app.field_converter' ]
-
-#    # Projections automatisch registrieren
-#    App\Conversion\Projection\:
-#        resource: '../../Classes/Projection/'
-#        tags: ['app.projection']
-
     NetGroup\DataTransformationLayer\Classes\Engine\ProjectionRegistry:
         arguments:
-            $projections: !tagged_iterator 'app.projection'
+            $projections: !tagged_iterator 'netgroup.datatransformation.projection'
 
     NetGroup\DataTransformationLayer\Classes\Engine\DatasetTransformer:
         arguments:
-            $converterLocator: !tagged_locator 'app.converter'
+            $converterLocator: !tagged_locator 'netgroup.datatransformation.converter'
 
     # Factories
     NetGroup\DataTransformationLayer\Classes\Services\Factories\DefinitionFactory: ~
