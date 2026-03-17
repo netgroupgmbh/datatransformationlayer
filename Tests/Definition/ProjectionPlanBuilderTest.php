@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace NetGroup\DataTransformationLayer\Tests\Definition;
 
+use NetGroup\DataTransformationLayer\Classes\Definition\FieldAdditionBuilder;
 use NetGroup\DataTransformationLayer\Classes\Definition\FieldRuleBuilder;
 use NetGroup\DataTransformationLayer\Classes\Definition\ProjectionPlan;
 use NetGroup\DataTransformationLayer\Classes\Definition\ProjectionPlanBuilder;
@@ -178,5 +179,105 @@ class ProjectionPlanBuilderTest extends TestCase
 
         // Assert
         $this->assertSame($result1, $result2);
+    }
+
+
+    /**
+     * Testet, dass `addField()` die Methode `createFieldAdditionBuilder()` der Factory
+     * mit dem internen Plan und dem uebergebenen Feldnamen aufruft.
+     */
+    public function testAddFieldCallsFactoryWithPlanAndTargetField(): void
+    {
+        // Anordnen
+        $targetField		= 'total_price';
+        $additionBuilder	= $this->createMock(FieldAdditionBuilder::class);
+
+        $this->factory
+            ->expects($this->once())
+            ->method('createFieldAdditionBuilder')
+            ->with($this->plan, $targetField)
+            ->willReturn($additionBuilder);
+
+        // Ausfuehren
+        $this->builder->addField($targetField);
+    }
+
+
+    /**
+     * Testet, dass `addField()` den von der Factory erstellten FieldAdditionBuilder zurueckgibt.
+     */
+    public function testAddFieldReturnsFieldAdditionBuilderFromFactory(): void
+    {
+        // Anordnen
+        $targetField		= 'total_price';
+        $additionBuilder	= $this->createMock(FieldAdditionBuilder::class);
+
+        $this->factory
+            ->method('createFieldAdditionBuilder')
+            ->willReturn($additionBuilder);
+
+        // Ausfuehren
+        $result = $this->builder->addField($targetField);
+
+        // Assert
+        $this->assertSame($additionBuilder, $result);
+    }
+
+
+    /**
+     * Testet, dass `removeField()` die Methode `addRemoval()` des Plans
+     * mit dem uebergebenen Feldnamen aufruft.
+     */
+    public function testRemoveFieldCallsAddRemovalOnPlan(): void
+    {
+        // Anordnen
+        $field = 'quantity';
+
+        $this->plan
+            ->expects($this->once())
+            ->method('addRemoval')
+            ->with($field);
+
+        // Ausfuehren
+        $this->builder->removeField($field);
+    }
+
+
+    /**
+     * Testet, dass `removeField()` die eigene Instanz zurueckgibt (Fluent Interface).
+     */
+    public function testRemoveFieldReturnsSelf(): void
+    {
+        // Anordnen
+        $field = 'quantity';
+
+        $this->plan
+            ->method('addRemoval');
+
+        // Ausfuehren
+        $result = $this->builder->removeField($field);
+
+        // Assert
+        $this->assertSame($this->builder, $result);
+    }
+
+
+    /**
+     * Testet, dass `removeField()` verkettet aufgerufen werden kann (Fluent Interface).
+     */
+    public function testRemoveFieldCanBeChained(): void
+    {
+        // Anordnen
+        $this->plan
+            ->expects($this->exactly(2))
+            ->method('addRemoval');
+
+        // Ausfuehren
+        $result = $this->builder
+            ->removeField('quantity')
+            ->removeField('unit_price');
+
+        // Assert
+        $this->assertSame($this->builder, $result);
     }
 }

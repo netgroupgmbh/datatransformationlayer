@@ -18,6 +18,7 @@ use NetGroup\DataTransformationLayer\Classes\Converter\FieldConverterInterface;
 use NetGroup\DataTransformationLayer\Classes\Converter\PrefetchingConverterInterface;
 use NetGroup\DataTransformationLayer\Classes\Definition\ConversionContext;
 use NetGroup\DataTransformationLayer\Classes\Definition\ConversionStep;
+use NetGroup\DataTransformationLayer\Classes\Definition\FieldAddition;
 use NetGroup\DataTransformationLayer\Classes\Definition\ProjectionPlan;
 use NetGroup\DataTransformationLayer\Classes\Engine\DatasetTransformer;
 use NetGroup\DataTransformationLayer\Classes\Engine\ProjectionRegistry;
@@ -72,9 +73,7 @@ class DatasetTransformerTest extends TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->planMock = $this->getMockBuilder(ProjectionPlan::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->planMock = $this->createPlanMock();
 
         $this->transformer = new DatasetTransformer($this->registryMock, $this->locatorMock);
     }
@@ -558,18 +557,414 @@ class DatasetTransformerTest extends TestCase
         $projectionName = 'my_special_projection';
         $rows           = [['field' => 'value']];
 
+        $this->planMock
+            ->method('stepsByField')
+            ->willReturn([]);
+
         $this->registryMock
             ->expects($this->once())
             ->method('getPlan')
             ->with($projectionName)
             ->willReturn($this->planMock);
 
-        $this->planMock
+        // Ausführen
+        $this->transformer->transform($rows, $projectionName, $this->contextMock);
+    }
+
+
+    /**
+     * Testet, dass `transform()` ein neues Feld via FieldAddition zum Row hinzufuegt.
+     */
+    public function testTransformAddsNewFieldViaAddition(): void
+    {
+        // Anordnen
+        $projectionName = 'test_projection';
+        $rows           = [['quantity' => 3, 'unit_price' => 100]];
+        $addition       = new FieldAddition('total_price', 'CalcConverter', ['op' => 'multiply'], '');
+
+        $planMock = $this->createPlanMock([$addition]);
+        $planMock
             ->method('stepsByField')
             ->willReturn([]);
 
-        // Ausführen
+        $converterMock = $this->getMockBuilder(FieldConverterInterface::class)->getMock();
+        $converterMock
+            ->method('convert')
+            ->willReturn(300);
+
+        $this->registryMock
+            ->method('getPlan')
+            ->willReturn($planMock);
+
+        $this->locatorMock
+            ->method('get')
+            ->willReturn($converterMock);
+
+        // Ausfuehren
+        $result = $this->transformer->transform($rows, $projectionName, $this->contextMock);
+
+        // Assert – das neue Feld ist vorhanden
+        $this->assertArrayHasKey('total_price', $result[0]);
+        $this->assertSame(300, $result[0]['total_price']);
+        // Originalfelder bleiben erhalten
+        $this->assertSame(3, $result[0]['quantity']);
+        $this->assertSame(100, $result[0]['unit_price']);
+    }
+
+
+    /**
+     * Testet, dass `transform()` bei einer Addition mit sourceField den Wert
+     * des Quellfeldes als Eingangswert an den Converter uebergibt.
+     */
+    public function testTransformAdditionUsesSourceFieldValue(): void
+    {
+        // Anordnen
+        $projectionName = 'test_projection';
+        $rows           = [['price' => 100]];
+        $addition       = new FieldAddition('formatted_price', 'FormatConverter', ['currency' => 'EUR'], 'price');
+
+        $planMock = $this->createPlanMock([$addition]);
+        $planMock
+            ->method('stepsByField')
+            ->willReturn([]);
+
+        $converterMock = $this->getMockBuilder(FieldConverterInterface::class)->getMock();
+        $converterMock
+            ->expects($this->once())
+            ->method('convert')
+            ->with(100, $rows[0], $this->contextMock, ['currency' => 'EUR'])
+            ->willReturn('100,00 €');
+
+        $this->registryMock
+            ->method('getPlan')
+            ->willReturn($planMock);
+
+        $this->locatorMock
+            ->method('get')
+            ->willReturn($converterMock);
+
+        // Ausfuehren
+        $result = $this->transformer->transform($rows, $projectionName, $this->contextMock);
+
+        // Assert
+        $this->assertSame('100,00 €', $result[0]['formatted_price']);
+    }
+
+
+    /**
+     * Testet, dass `transform()` bei einer Addition ohne sourceField (leerer String)
+     * null als Eingangswert an den Converter uebergibt.
+     */
+    public function testTransformAdditionPassesNullWhenSourceFieldIsEmpty(): void
+    {
+        // Anordnen
+        $projectionName = 'test_projection';
+        $rows           = [['quantity' => 3, 'unit_price' => 100]];
+        $addition       = new FieldAddition('total_price', 'CalcConverter', [], '');
+
+        $planMock = $this->createPlanMock([$addition]);
+        $planMock
+            ->method('stepsByField')
+            ->willReturn([]);
+
+        $converterMock = $this->getMockBuilder(FieldConverterInterface::class)->getMock();
+        $converterMock
+            ->expects($this->once())
+            ->method('convert')
+            ->with(null)
+            ->willReturn(300);
+
+        $this->registryMock
+            ->method('getPlan')
+            ->willReturn($planMock);
+
+        $this->locatorMock
+            ->method('get')
+            ->willReturn($converterMock);
+
+        // Ausfuehren
         $this->transformer->transform($rows, $projectionName, $this->contextMock);
+    }
+
+
+    /**
+     * Testet, dass `transform()` Felder via Removal aus dem Output entfernt.
+     */
+    public function testTransformRemovesFieldsViaRemoval(): void
+    {
+        // Anordnen
+        $projectionName = 'test_projection';
+        $rows           = [['quantity' => 3, 'unit_price' => 100, 'name' => 'Widget']];
+
+        $planMock = $this->createPlanMock([], ['quantity', 'unit_price']);
+        $planMock
+            ->method('stepsByField')
+            ->willReturn([]);
+
+        $this->registryMock
+            ->method('getPlan')
+            ->willReturn($planMock);
+
+        // Ausfuehren
+        $result = $this->transformer->transform($rows, $projectionName, $this->contextMock);
+
+        // Assert – entfernte Felder sind nicht mehr vorhanden
+        $this->assertArrayNotHasKey('quantity', $result[0]);
+        $this->assertArrayNotHasKey('unit_price', $result[0]);
+        // Nicht entfernte Felder bleiben erhalten
+        $this->assertSame('Widget', $result[0]['name']);
+    }
+
+
+    /**
+     * Testet die Reihenfolge Convert -> Add -> Remove:
+     * Ein bestehendes Feld wird konvertiert, ein neues Feld hinzugefuegt,
+     * und ein Feld entfernt.
+     */
+    public function testTransformExecutesConvertThenAddThenRemove(): void
+    {
+        // Anordnen
+        $projectionName = 'test_projection';
+        $rows           = [['quantity' => 3, 'unit_price' => 100]];
+        $step           = new ConversionStep('UpperConverter', []);
+        $addition       = new FieldAddition('total', 'CalcConverter', [], '');
+
+        $planMock = $this->createPlanMock([$addition], ['unit_price']);
+        $planMock
+            ->method('stepsByField')
+            ->willReturn(['quantity' => [$step]]);
+
+        $upperConverter = $this->getMockBuilder(FieldConverterInterface::class)->getMock();
+        $upperConverter
+            ->method('convert')
+            ->willReturn(5);
+
+        $calcConverter = $this->getMockBuilder(FieldConverterInterface::class)->getMock();
+        $calcConverter
+            ->method('convert')
+            ->willReturn(500);
+
+        $this->registryMock
+            ->method('getPlan')
+            ->willReturn($planMock);
+
+        $this->locatorMock
+            ->method('get')
+            ->willReturnMap([
+                ['UpperConverter', $upperConverter],
+                ['CalcConverter', $calcConverter],
+            ]);
+
+        // Ausfuehren
+        $result = $this->transformer->transform($rows, $projectionName, $this->contextMock);
+
+        // Assert – Convert wurde ausgefuehrt
+        $this->assertSame(5, $result[0]['quantity']);
+        // Assert – Addition wurde hinzugefuegt
+        $this->assertSame(500, $result[0]['total']);
+        // Assert – Removal wurde ausgefuehrt
+        $this->assertArrayNotHasKey('unit_price', $result[0]);
+    }
+
+
+    /**
+     * Testet, dass `transform()` fuer einen Addition-Converter, der `PrefetchingConverterInterface`
+     * implementiert, `prefetch()` aufruft.
+     */
+    public function testTransformCallsPrefetchOnAdditionConverter(): void
+    {
+        // Anordnen
+        $projectionName = 'test_projection';
+        $params         = ['lookup' => true];
+        $rows           = [['id' => 1]];
+        $addition       = new FieldAddition('label', 'PrefetchingConverter', $params, 'id');
+
+        $planMock = $this->createPlanMock([$addition]);
+        $planMock
+            ->method('stepsByField')
+            ->willReturn([]);
+
+        $prefetchingConverterMock = $this->getMockBuilder(PrefetchingFieldConverterInterface::class)->getMock();
+        $prefetchingConverterMock
+            ->expects($this->once())
+            ->method('prefetch')
+            ->with($rows, $this->contextMock, $params);
+
+        $prefetchingConverterMock
+            ->method('convert')
+            ->willReturnArgument(0);
+
+        $this->registryMock
+            ->method('getPlan')
+            ->willReturn($planMock);
+
+        $this->locatorMock
+            ->method('get')
+            ->willReturn($prefetchingConverterMock);
+
+        // Ausfuehren
+        $this->transformer->transform($rows, $projectionName, $this->contextMock);
+    }
+
+
+    /**
+     * Testet, dass Prefetch ueber Convert-Steps und Additions hinweg dedupliziert wird:
+     * Wenn derselbe Converter mit denselben Params sowohl in einem Step als auch in einer
+     * Addition verwendet wird, wird `prefetch()` nur einmal aufgerufen.
+     */
+    public function testTransformDeduplicatesPrefetchAcrossStepsAndAdditions(): void
+    {
+        // Anordnen
+        $projectionName = 'test_projection';
+        $params         = ['key' => 'value'];
+        $rows           = [['field1' => 'a']];
+        $step           = new ConversionStep('SharedConverter', $params);
+        $addition       = new FieldAddition('new_field', 'SharedConverter', $params, '');
+
+        $planMock = $this->createPlanMock([$addition]);
+        $planMock
+            ->method('stepsByField')
+            ->willReturn(['field1' => [$step]]);
+
+        $prefetchingConverterMock = $this->getMockBuilder(PrefetchingFieldConverterInterface::class)->getMock();
+
+        // prefetch() darf nur einmal aufgerufen werden
+        $prefetchingConverterMock
+            ->expects($this->once())
+            ->method('prefetch');
+
+        $prefetchingConverterMock
+            ->method('convert')
+            ->willReturnArgument(0);
+
+        $this->registryMock
+            ->method('getPlan')
+            ->willReturn($planMock);
+
+        $this->locatorMock
+            ->method('get')
+            ->willReturn($prefetchingConverterMock);
+
+        // Ausfuehren
+        $this->transformer->transform($rows, $projectionName, $this->contextMock);
+    }
+
+
+    /**
+     * Testet, dass `transform()` mehrere Rows korrekt mit Additions und Removals verarbeitet.
+     */
+    public function testTransformHandlesMultipleRowsWithAdditionsAndRemovals(): void
+    {
+        // Anordnen
+        $projectionName = 'test_projection';
+        $rows           = [
+            ['name' => 'alice', 'age' => 30],
+            ['name' => 'bob', 'age' => 25],
+        ];
+        $addition       = new FieldAddition('greeting', 'GreetConverter', [], 'name');
+
+        $planMock = $this->createPlanMock([$addition], ['age']);
+        $planMock
+            ->method('stepsByField')
+            ->willReturn([]);
+
+        $converterMock = $this->getMockBuilder(FieldConverterInterface::class)->getMock();
+        $converterMock
+            ->method('convert')
+            ->willReturnCallback(static fn (mixed $value): string => 'Hello ' . $value);
+
+        $this->registryMock
+            ->method('getPlan')
+            ->willReturn($planMock);
+
+        $this->locatorMock
+            ->method('get')
+            ->willReturn($converterMock);
+
+        // Ausfuehren
+        $result = $this->transformer->transform($rows, $projectionName, $this->contextMock);
+
+        // Assert – Additions
+        $this->assertSame('Hello alice', $result[0]['greeting']);
+        $this->assertSame('Hello bob', $result[1]['greeting']);
+        // Assert – Removals
+        $this->assertArrayNotHasKey('age', $result[0]);
+        $this->assertArrayNotHasKey('age', $result[1]);
+        // Assert – nicht entfernte Felder bleiben erhalten
+        $this->assertSame('alice', $result[0]['name']);
+        $this->assertSame('bob', $result[1]['name']);
+    }
+
+
+    /**
+     * Testet, dass Additions auf bereits konvertierte Werte zugreifen koennen,
+     * da Convert vor Add ausgefuehrt wird.
+     */
+    public function testAdditionCanAccessConvertedValues(): void
+    {
+        // Anordnen
+        $projectionName = 'test_projection';
+        $rows           = [['price' => 100]];
+        $step           = new ConversionStep('DoubleConverter', []);
+        $addition       = new FieldAddition('formatted', 'FormatConverter', [], 'price');
+
+        $planMock = $this->createPlanMock([$addition]);
+        $planMock
+            ->method('stepsByField')
+            ->willReturn(['price' => [$step]]);
+
+        $doubleConverter = $this->getMockBuilder(FieldConverterInterface::class)->getMock();
+        $doubleConverter
+            ->method('convert')
+            ->willReturnCallback(static fn (mixed $value): int => (int) $value * 2);
+
+        // Der FormatConverter erhaelt den bereits konvertierten Wert (200),
+        // da er nach dem Convert ausgefuehrt wird.
+        $formatConverter = $this->getMockBuilder(FieldConverterInterface::class)->getMock();
+        $formatConverter
+            ->method('convert')
+            ->willReturnCallback(static fn (mixed $value): string => $value . ' EUR');
+
+        $this->registryMock
+            ->method('getPlan')
+            ->willReturn($planMock);
+
+        $this->locatorMock
+            ->method('get')
+            ->willReturnMap([
+                ['DoubleConverter', $doubleConverter],
+                ['FormatConverter', $formatConverter],
+            ]);
+
+        // Ausfuehren
+        $result = $this->transformer->transform($rows, $projectionName, $this->contextMock);
+
+        // Assert – Convert wurde ausgefuehrt
+        $this->assertSame(200, $result[0]['price']);
+        // Assert – Addition hat den konvertierten Wert erhalten
+        $this->assertSame('200 EUR', $result[0]['formatted']);
+    }
+
+
+    /**
+     * Erstellt einen frischen ProjectionPlan-Mock mit leeren Defaults
+     * fuer additions() und removals().
+     *
+     * @param list<FieldAddition> $additions
+     * @param list<string>        $removals
+     *
+     * @return ProjectionPlan&MockObject
+     */
+    private function createPlanMock(array $additions = [], array $removals = []): ProjectionPlan
+    {
+        $plan = $this->getMockBuilder(ProjectionPlan::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $plan->method('additions')->willReturn($additions);
+        $plan->method('removals')->willReturn($removals);
+
+        return $plan;
     }
 }
 

@@ -18,6 +18,7 @@ use NetGroup\DataTransformationLayer\Classes\Converter\FieldConverterInterface;
 use NetGroup\DataTransformationLayer\Classes\Converter\PrefetchingConverterInterface;
 use NetGroup\DataTransformationLayer\Classes\Definition\ConversionContext;
 use NetGroup\DataTransformationLayer\Classes\Definition\ConversionStep;
+use NetGroup\DataTransformationLayer\Classes\Definition\FieldAddition;
 use Psr\Container\ContainerInterface;
 
 class DatasetTransformer
@@ -72,8 +73,25 @@ class DatasetTransformer
             }
         }
 
+        // Prefetch fuer Additions
+        foreach ($plan->additions() as $addition) {
+            $key = $this->additionPrefetchKey($addition);
+            if (isset($prefetched[$key])) {
+                continue;
+            }
+
+            $converter = $this->getConverter($addition->converterClass);
+
+            if ($converter instanceof PrefetchingConverterInterface) {
+                $converter->prefetch($rows, $context, $addition->params);
+            }
+
+            $prefetched[$key] = true;
+        }
+
         // 2) Pro Row konvertieren
         foreach ($rows as $i => $row) {
+            // 2a) Bestehende Felder konvertieren (wie bisher)
             foreach ($plan->stepsByField() as $field => $steps) {
                 $value = $row[$field] ?? null;
 
@@ -83,6 +101,26 @@ class DatasetTransformer
                 }
 
                 $row[$field] = $value;
+            }
+
+            // 2b) Neue Felder hinzufuegen
+            foreach ($plan->additions() as $addition) {
+                $sourceValue = ('' !== $addition->sourceField)
+                    ? ($row[$addition->sourceField] ?? null)
+                    : null;
+
+                $converter                  = $this->getConverter($addition->converterClass);
+                $row[$addition->targetField] = $converter->convert(
+                    $sourceValue,
+                    $row,
+                    $context,
+                    $addition->params,
+                );
+            }
+
+            // 2c) Felder entfernen
+            foreach ($plan->removals() as $field) {
+                unset($row[$field]);
             }
 
             $rows[$i] = $row;
@@ -102,6 +140,19 @@ class DatasetTransformer
     private function prefetchKey(ConversionStep $step): string
     {
         return $step->converterClass . '|' . \md5(\json_encode($step->params, JSON_THROW_ON_ERROR));
+    }
+
+
+    /**
+     * @param FieldAddition $addition
+     *
+     * @return string
+     *
+     * @throws \JsonException
+     */
+    private function additionPrefetchKey(FieldAddition $addition): string
+    {
+        return $addition->converterClass . '|' . \md5(\json_encode($addition->params, JSON_THROW_ON_ERROR));
     }
 
 

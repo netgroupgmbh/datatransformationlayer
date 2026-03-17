@@ -4,7 +4,7 @@
 ![PHP](https://img.shields.io/badge/PHP-%5E8.3-777bb4.svg)
 ![Contao](https://img.shields.io/badge/Contao-%5E5.3-ea5d0b.svg)
 
-Eine schlanke **Data Transformation Layer** für Contao-Bundles: Du definierst **Projections** (ausgabespezifische Feld-Transformationen) und wendest sie effizient auf große DBAL-Resultsets an – inklusive **Prefetching**, um N+1-Queries zu vermeiden.
+Eine schlanke **Data Transformation Layer** für Contao-Bundles: Du definierst **Projections** (ausgabespezifische Feld-Transformationen) und wendest sie effizient auf große Datenmengen0 an – inklusive **Prefetching**, um N+1-Queries zu vermeiden. Neben der Transformation bestehender Felder können auch **neue berechnete Felder hinzugefügt** und **bestehende Felder entfernt** werden.
 
 ---
 
@@ -21,6 +21,9 @@ Eine schlanke **Data Transformation Layer** für Contao-Bundles: Du definierst *
   - [2) Converter erstellen](#2-converter-erstellen)
   - [3) Transformer anwenden](#3-transformer-anwenden)
   - [4) Prefetching (N+1 vermeiden)](#4-prefetching-n1-vermeiden)
+  - [5) Felder hinzufügen (Additions)](#5-felder-hinzufügen-additions)
+  - [6) Felder entfernen (Removals)](#6-felder-entfernen-removals)
+  - [7) Kombiniertes Beispiel](#7-kombiniertes-beispiel)
 - [Fehler- & Null-Policy](#fehler--null-policy)
 - [Architektur (kurz)](#architektur-kurz)
 - [Lexikon (Begriffe)](#lexikon-begriffe)
@@ -39,19 +42,21 @@ werden können (Twig-Templates, Exporte, APIs), müssen Werte oft transformiert 
 - Ersetzen technischer Werte durch Anzeige-Werte (z. B. `member_id -> "Jane Doe"`)
 - Normalisieren/Ableiten von Feldern (z. B. Status-Labels, berechnete Summen)
 - Anreichern mit Lookup-Daten aus anderen Tabellen
+- Hinzufügen berechneter Felder (z. B. `total_price` aus `quantity * unit_price`)
+- Entfernen technischer Hilfsspalten aus dem Output
 
-Eine naive Implementierung verteilt diese Logik oft über Controller, Templates und Repositories. Das führt schnell zu:
+Ohne klare Trennung der Verantwortlichkeiten wird diese Logik häufig über Controller, Templates und Repositories verteilt. Das führt schnell zu:
 
 - **starker Kopplung** zwischen Query-Logik und Darstellung
 - **Duplikation**, sobald mehrere Ausgaben unterschiedliche Formate benötigen (Liste vs. Export vs. API)
 - **Performance-Problemen**, insbesondere N+1-Queries, wenn Fremdschlüssel pro Zeile einzeln aufgelöst werden
-- fragiler Konfiguration durch „stringly typed“ Arrays
+- fragile Konfiguration durch „stringly typed“ Arrays
 
 **Lösung:**
 Dieses Paket liefert eine **Projection-basierte Transformation Layer**:
 
-- Eine *Projection* ist eine PHP-Klasse (Symfony-Service), die definiert, *welche Felder* für eine Ausgabe transformiert werden.
-- Ein *Converter* ist ein wiederverwendbarer Feld-Transformer (Formatting, Lookup, Mapping).
+- Eine *Projection* ist eine PHP-Klasse, die definiert, *welche Felder* für eine Ausgabe transformiert, hinzugefügt oder entfernt werden.
+- Ein *Converter* ist ein wiederverwendbarer Feld-Transformer (Formatting, Lookup, Mapping, Berechnung).
 - Converter mit Prefetching können benötigte Lookup-Daten **einmal pro Dataset** laden und so N+1 verhindern.
 
 Dadurch bleiben DBAL-Queries sauber, Ausgabelogik ist explizit und wiederverwendbar, und große Datenmengen können effizient verarbeitet werden.
@@ -60,10 +65,12 @@ Dadurch bleiben DBAL-Queries sauber, Ausgabelogik ist explizit und wiederverwend
 
 ## Features
 
-- Projection-Definitionen als **PHP-Klassen** (keine „Array of strings“-Konfiguration)
+- Projection-Definitionen als **PHP-Klassen** (keine „Array of strings"-Konfiguration)
 - Converter-Referenzen via `::class` (refactor-freundlich, IDE-sicher)
 - Optionales **Prefetching** gegen N+1 Lookups
-- Für **DBAL-Result-Arrays** gedacht (`fetchAllAssociative()`)
+- **Felder hinzufügen** (berechnete Werte, abgeleitete Felder)
+- **Felder entfernen** (Hilfsspalten nach Berechnung entfernen)
+- Direkte Verwendung von **DBAL-Result-Arrays** möglich (`fetchAllAssociative()`)
 - Symfony-Integration über **Tagged Services** + `ServiceLocator`
 - Geeignet für tausende Datensätze (Request-lokales Caching möglich)
 
@@ -111,13 +118,16 @@ services:
     tags: ['netgroup.datatransformation.projection']
 ```
 
+_(Pfade müssen ggf. angepasst werden.)_
+
 ---
 
 ## Quickstart
 
 1. Projection-Klasse erstellen (z. B. `member_list`)
 2. Converter-Klassen erstellen (z. B. Datum formatieren, Lookups)
-3. DBAL-Resultset mit `DatasetTransformer` transformieren
+3. Optional: Berechnete Felder hinzufügen (`addField`) oder Felder entfernen (`removeField`)
+4. DBAL-Resultset mit `DatasetTransformer` transformieren
 
 ---
 
@@ -369,6 +379,167 @@ final class PageTitleLookupConverter implements FieldConverterInterface, Prefetc
 
 ---
 
+### 5) Felder hinzufügen (Additions)
+
+Mit `addField()` können neue, berechnete Felder zum Output hinzugefügt werden, ohne bestehende Felder zu verändern. Das ist nützlich, wenn:
+
+- ein berechneter Wert zusätzlich zu den Originalwerten ausgegeben werden soll
+- abgeleitete Felder aus bestehenden Daten erzeugt werden sollen
+- Lookup-Werte als separates Feld neben der technischen ID erscheinen sollen
+
+#### API
+
+```php
+$builder->addField('zielfeld_name')
+        ->compute(ConverterClass::class, $params, 'optionales_quellfeld');
+```
+
+- **`addField($targetField)`** – gibt einen `FieldAdditionBuilder` zurück
+- **`compute($converterClass, $params, $sourceField)`** – definiert den Converter, der den Wert für das neue Feld berechnet
+  - `$converterClass` – FQCN eines `FieldConverterInterface`
+  - `$params` – Converter-Parameter (optional, Standard: `[]`)
+  - `$sourceField` – Name eines bestehenden Feldes, dessen Wert als Eingangswert an den Converter übergeben wird (optional, Standard: `''` → Converter erhält `null` als Eingangswert)
+
+#### Beispiel: Berechnetes Feld mit Quellfeld
+
+```php
+public function build(ProjectionPlanBuilder $builder): void
+{
+    // Neues Feld 'formatted_price' aus dem bestehenden Feld 'price'
+    $builder->addField('formatted_price')
+            ->compute(CurrencyFormatConverter::class, ['currency' => 'EUR'], 'price');
+}
+```
+
+**Ergebnis:** Jede Row enthält nun zusätzlich `formatted_price`. Das Originalfeld `price` bleibt unverändert erhalten.
+
+#### Beispiel: Berechnetes Feld ohne Quellfeld
+
+Wenn der Converter seinen Wert vollständig aus der gesamten Row berechnet (via `$row`-Parameter), kann `sourceField` weggelassen werden. Der Converter erhält dann `null` als `$value`.
+
+```php
+public function build(ProjectionPlanBuilder $builder): void
+{
+    // Neues Feld 'full_name' aus firstname + lastname (kein einzelnes Quellfeld)
+    $builder->addField('full_name')
+            ->compute(FullNameConverter::class);
+}
+```
+
+#### Beispiel: Mehrere compute()-Schritte verketten
+
+`compute()` unterstützt Fluent Chaining – der Rückgabewert des ersten Converters wird als Eingangswert des zweiten verwendet:
+
+```php
+$builder->addField('display_label')
+        ->compute(LookupConverter::class, ['table' => 'tl_page'], 'pid')
+        ->compute(TruncateConverter::class, ['maxLength' => 50]);
+```
+
+> **Hinweis:** Additions werden *nach* den regulären Feld-Konvertierungen ausgeführt. Dadurch haben Addition-Converter Zugriff auf bereits konvertierte Feldwerte in `$row`.
+
+---
+
+### 6) Felder entfernen (Removals)
+
+Mit `removeField()` können Felder aus dem Output entfernt werden. Das ist nützlich, wenn:
+
+- Hilfsspalten nach einer Berechnung nicht mehr benötigt werden
+- technische Felder (z. B. IDs) nicht in der Ausgabe erscheinen sollen
+- sensible Daten vor der Ausgabe gefiltert werden müssen
+
+#### API
+
+```php
+$builder->removeField('feldname');
+```
+
+`removeField()` gibt `$this` zurück und unterstützt Fluent Chaining:
+
+```php
+$builder->removeField('quantity')
+        ->removeField('unit_price');
+```
+
+#### Beispiel
+
+```php
+public function build(ProjectionPlanBuilder $builder): void
+{
+    // Technische IDs entfernen
+    $builder->removeField('pid');
+    $builder->removeField('sorting');
+}
+```
+
+> **Hinweis:** Removals werden *nach* den Additions ausgeführt. Dadurch kann ein Feld zunächst als Quellwert für eine Addition dienen und anschließend entfernt werden.
+
+---
+
+### 7) Kombiniertes Beispiel
+
+Ein typischer Use Case: Aus `quantity` und `unit_price` wird ein berechnetes Feld `total_price` erzeugt, und die technischen Felder werden anschließend entfernt.
+
+```php
+<?php
+
+namespace App\Conversion\Projection;
+
+use NetGroup\DataTransformationLayer\Classes\Definition\ProjectionPlanBuilder;
+use NetGroup\DataTransformationLayer\Classes\Projection\ProjectionInterface;
+use App\Conversion\Converter\DateTimeFormatConverter;
+use App\Conversion\Converter\MultiplyFieldsConverter;
+
+final class OrderExportProjection implements ProjectionInterface
+{
+    public function name(): string
+    {
+        return 'order_export';
+    }
+
+    public function build(ProjectionPlanBuilder $builder): void
+    {
+        // 1) Bestehendes Feld transformieren
+        $builder->field('created_at')
+                ->convert(DateTimeFormatConverter::class, ['format' => 'd.m.Y']);
+
+        // 2) Neues berechnetes Feld hinzufügen
+        $builder->addField('total_price')
+                ->compute(MultiplyFieldsConverter::class, [
+                    'fields' => ['quantity', 'unit_price'],
+                ]);
+
+        // 3) Originalfelder nach Berechnung entfernen
+        $builder->removeField('quantity');
+        $builder->removeField('unit_price');
+    }
+}
+```
+
+**Input:**
+```
+['created_at' => 1710700800, 'quantity' => 3, 'unit_price' => 2500, 'name' => 'Widget']
+```
+
+**Output:**
+```
+['created_at' => '17.03.2026', 'total_price' => 7500, 'name' => 'Widget']
+```
+
+#### Ausführungsreihenfolge
+
+Der `DatasetTransformer` führt die drei Operationstypen in einer festen Reihenfolge aus:
+
+1. **Convert** – Bestehende Felder transformieren (Wert-Pipeline)
+2. **Add** – Neue berechnete Felder hinzufügen (Additions)
+3. **Remove** – Felder aus dem Output entfernen (Removals)
+
+Diese Reihenfolge stellt sicher, dass:
+- Additions auf bereits konvertierte Werte zugreifen können
+- Removals erst am Ende greifen, sodass Felder sowohl als Quellwert für Additions als auch für Convert-Pipelines dienen können
+
+---
+
 ## Fehler- & Null-Policy
 
 Damit Ausgaben stabil und vorhersehbar sind, sollte im Projekt eine klare Policy gelten. Dieses Paket ist bewusst flexibel; du solltest dich aber **explizit** für ein Verhalten entscheiden.
@@ -405,9 +576,11 @@ Das Paket trennt bewusst drei Ebenen:
    - Keine Formatierung/Lookup-Logik.
 
 2. **Transformation Layer (Projections + Converter)**
-   - Eine Projection definiert transformationsregeln pro Ausgabe (Liste/Export/API).
+   - Eine Projection definiert Transformationsregeln pro Ausgabe (Liste/Export/API).
    - Converter sind kleine, wiederverwendbare Bausteine.
    - Prefetching verhindert N+1.
+   - Additions erzeugen neue berechnete Felder.
+   - Removals entfernen nicht benötigte Felder aus dem Output.
 
 3. **Presentation Layer (Twig/JSON/Export)**
    - Bekommt „ready-to-display“ Daten.
@@ -424,7 +597,9 @@ Das Paket trennt bewusst drei Ebenen:
 - **Converter**: Baustein, der einen Feldwert transformiert (Formatierung, Mapping, Lookup, …).
 - **Pipeline**: Mehrere Converter-Schritte hintereinander für ein Feld (z. B. `trim` → `map` → `format`).
 - **Prefetching**: Einmaliges Vorladen von Lookup-Daten pro Dataset, um N+1 zu verhindern.
-- **ConversionContext**: Kontextinformationen (z. B. `timezone`, „caller“-Optionen), die Converter nutzen können.
+- **Addition (FieldAddition)**: Definition eines neuen, berechneten Feldes im Output. Wird über `addField()` im Builder definiert.
+- **Removal**: Markierung eines Feldes zur Entfernung aus dem Output. Wird über `removeField()` im Builder definiert.
+- **ConversionContext**: Kontextinformationen (z. B. `timezone`, „caller"-Optionen), die Converter nutzen können.
 
 ---
 

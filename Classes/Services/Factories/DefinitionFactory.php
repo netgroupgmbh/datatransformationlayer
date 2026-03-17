@@ -16,6 +16,8 @@ namespace NetGroup\DataTransformationLayer\Classes\Services\Factories;
 
 use NetGroup\DataTransformationLayer\Classes\Definition\ConversionContext;
 use NetGroup\DataTransformationLayer\Classes\Definition\ConversionStep;
+use NetGroup\DataTransformationLayer\Classes\Definition\FieldAddition;
+use NetGroup\DataTransformationLayer\Classes\Definition\FieldAdditionBuilder;
 use NetGroup\DataTransformationLayer\Classes\Definition\FieldRuleBuilder;
 use NetGroup\DataTransformationLayer\Classes\Definition\ProjectionPlan;
 use NetGroup\DataTransformationLayer\Classes\Definition\ProjectionPlanBuilder;
@@ -60,6 +62,24 @@ class DefinitionFactory
 
 
     /**
+     * @param string               $targetField
+     * @param class-string         $converterClass
+     * @param array<string, mixed> $params
+     * @param string               $sourceField
+     *
+     * @return FieldAddition
+     */
+    public function createFieldAddition(
+        string $targetField,
+        string $converterClass,
+        array $params,
+        string $sourceField,
+    ): FieldAddition {
+        return new FieldAddition($targetField, $converterClass, $params, $sourceField);
+    }
+
+
+    /**
      * @param ProjectionPlan $plan
      * @param string         $field
      *
@@ -68,6 +88,18 @@ class DefinitionFactory
     public function createFieldRuleBuilder(ProjectionPlan $plan, string $field): FieldRuleBuilder
     {
         return new FieldRuleBuilder($plan, $this, $field);
+    }
+
+
+    /**
+     * @param ProjectionPlan $plan
+     * @param string         $targetField
+     *
+     * @return FieldAdditionBuilder
+     */
+    public function createFieldAdditionBuilder(ProjectionPlan $plan, string $targetField): FieldAdditionBuilder
+    {
+        return new FieldAdditionBuilder($plan, $this, $targetField);
     }
 
 

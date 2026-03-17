@@ -14,6 +14,8 @@ declare(strict_types=1);
 
 namespace NetGroup\DataTransformationLayer\Tests\Services\Factories;
 
+use NetGroup\DataTransformationLayer\Classes\Definition\FieldAddition;
+use NetGroup\DataTransformationLayer\Classes\Definition\FieldAdditionBuilder;
 use NetGroup\DataTransformationLayer\Classes\Definition\FieldRuleBuilder;
 use NetGroup\DataTransformationLayer\Classes\Definition\ProjectionPlan;
 use NetGroup\DataTransformationLayer\Classes\Definition\ProjectionPlanBuilder;
@@ -243,6 +245,143 @@ class DefinitionFactoryTest extends TestCase
         // Ausführen
         $result1 = $this->factory->createProjectionPlanBuilder($name);
         $result2 = $this->factory->createProjectionPlanBuilder($name);
+
+        // Assert
+        $this->assertNotSame($result1, $result2);
+    }
+
+
+    /**
+     * Testet, dass `createFieldAddition()` eine Instanz von `FieldAddition` zurueckgibt,
+     * bei der das targetField korrekt gesetzt ist.
+     */
+    public function testCreateFieldAdditionReturnsFieldAdditionWithCorrectTargetField(): void
+    {
+        // Anordnen
+        $targetField    = 'total_price';
+        $converterClass = 'SomeConverter';
+        $params         = [];
+        $sourceField    = '';
+
+        // Ausfuehren
+        $result = $this->factory->createFieldAddition($targetField, $converterClass, $params, $sourceField);
+
+        // Assert
+        $this->assertSame($targetField, $result->targetField);
+    }
+
+
+    /**
+     * Testet, dass `createFieldAddition()` eine Instanz von `FieldAddition` zurueckgibt,
+     * bei der der converterClass korrekt gesetzt ist.
+     */
+    public function testCreateFieldAdditionReturnsFieldAdditionWithCorrectConverterClass(): void
+    {
+        // Anordnen
+        $targetField    = 'total_price';
+        $converterClass = 'MyConverter';
+        $params         = [];
+        $sourceField    = '';
+
+        // Ausfuehren
+        $result = $this->factory->createFieldAddition($targetField, $converterClass, $params, $sourceField);
+
+        // Assert
+        $this->assertSame($converterClass, $result->converterClass);
+    }
+
+
+    /**
+     * Testet, dass `createFieldAddition()` eine Instanz von `FieldAddition` zurueckgibt,
+     * bei der die params korrekt gesetzt sind.
+     */
+    public function testCreateFieldAdditionReturnsFieldAdditionWithCorrectParams(): void
+    {
+        // Anordnen
+        $targetField    = 'total_price';
+        $converterClass = 'SomeConverter';
+        $params         = ['fields' => ['quantity', 'unit_price']];
+        $sourceField    = '';
+
+        // Ausfuehren
+        $result = $this->factory->createFieldAddition($targetField, $converterClass, $params, $sourceField);
+
+        // Assert
+        $this->assertSame($params, $result->params);
+    }
+
+
+    /**
+     * Testet, dass `createFieldAddition()` eine Instanz von `FieldAddition` zurueckgibt,
+     * bei der das sourceField korrekt gesetzt ist.
+     */
+    public function testCreateFieldAdditionReturnsFieldAdditionWithCorrectSourceField(): void
+    {
+        // Anordnen
+        $targetField    = 'total_price';
+        $converterClass = 'SomeConverter';
+        $params         = [];
+        $sourceField    = 'unit_price';
+
+        // Ausfuehren
+        $result = $this->factory->createFieldAddition($targetField, $converterClass, $params, $sourceField);
+
+        // Assert
+        $this->assertSame($sourceField, $result->sourceField);
+    }
+
+
+    /**
+     * Testet, dass `createFieldAddition()` bei jedem Aufruf eine neue,
+     * eigenstaendige Instanz von `FieldAddition` zurueckgibt.
+     */
+    public function testCreateFieldAdditionReturnsNewInstanceOnEachCall(): void
+    {
+        // Anordnen
+        $targetField    = 'total_price';
+        $converterClass = 'SomeConverter';
+        $params         = [];
+        $sourceField    = '';
+
+        // Ausfuehren
+        $result1 = $this->factory->createFieldAddition($targetField, $converterClass, $params, $sourceField);
+        $result2 = $this->factory->createFieldAddition($targetField, $converterClass, $params, $sourceField);
+
+        // Assert
+        $this->assertNotSame($result1, $result2);
+    }
+
+
+    /**
+     * Testet, dass `createFieldAdditionBuilder()` eine Instanz von `FieldAdditionBuilder` zurueckgibt.
+     */
+    public function testCreateFieldAdditionBuilderReturnsFieldAdditionBuilder(): void
+    {
+        // Anordnen
+        $plan        = new ProjectionPlan('testPlan');
+        $targetField = 'total_price';
+
+        // Ausfuehren
+        $result = $this->factory->createFieldAdditionBuilder($plan, $targetField);
+
+        // Assert
+        $this->assertInstanceOf(FieldAdditionBuilder::class, $result);
+    }
+
+
+    /**
+     * Testet, dass `createFieldAdditionBuilder()` bei jedem Aufruf eine neue,
+     * eigenstaendige Instanz von `FieldAdditionBuilder` zurueckgibt.
+     */
+    public function testCreateFieldAdditionBuilderReturnsNewInstanceOnEachCall(): void
+    {
+        // Anordnen
+        $plan        = new ProjectionPlan('testPlan');
+        $targetField = 'total_price';
+
+        // Ausfuehren
+        $result1 = $this->factory->createFieldAdditionBuilder($plan, $targetField);
+        $result2 = $this->factory->createFieldAdditionBuilder($plan, $targetField);
 
         // Assert
         $this->assertNotSame($result1, $result2);

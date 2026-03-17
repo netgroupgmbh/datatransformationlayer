@@ -47,6 +47,34 @@ class ProjectionPlanBuilder
 
 
     /**
+     * Erstellt einen Builder fuer ein neues, berechnetes Feld.
+     *
+     * @param string $targetField
+     *
+     * @return FieldAdditionBuilder
+     */
+    public function addField(string $targetField): FieldAdditionBuilder
+    {
+        return $this->factory->createFieldAdditionBuilder($this->plan, $targetField);
+    }
+
+
+    /**
+     * Markiert ein Feld zur Entfernung aus dem Output.
+     *
+     * @param string $field
+     *
+     * @return self
+     */
+    public function removeField(string $field): self
+    {
+        $this->plan->addRemoval($field);
+
+        return $this;
+    }
+
+
+    /**
      * @return ProjectionPlan
      */
     public function getPlan(): ProjectionPlan
