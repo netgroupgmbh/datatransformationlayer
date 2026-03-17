@@ -43,7 +43,7 @@ class DatasetTransformerTest extends TestCase
 
 
     /**
-     * @var ConversionContext&MockObject
+     * @var ConversionContext
      */
     private ConversionContext $contextMock;
 
@@ -69,9 +69,7 @@ class DatasetTransformerTest extends TestCase
         $this->locatorMock = $this->getMockBuilder(ContainerInterface::class)
             ->getMock();
 
-        $this->contextMock = $this->getMockBuilder(ConversionContext::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->contextMock = new ConversionContext('test_projection');
 
         $this->planMock = $this->createPlanMock();
 
@@ -86,11 +84,10 @@ class DatasetTransformerTest extends TestCase
     public function testTransformReturnsEmptyArrayWhenRowsIsEmpty(): void
     {
         // Anordnen
-        $rows           = [];
-        $projectionName = 'test_projection';
+        $rows = [];
 
         // Ausführen
-        $result = $this->transformer->transform($rows, $projectionName, $this->contextMock);
+        $result = $this->transformer->transform($rows, $this->contextMock);
 
         // Assert
         $this->assertSame([], $result);
@@ -109,7 +106,7 @@ class DatasetTransformerTest extends TestCase
             ->method('getPlan');
 
         // Ausführen
-        $this->transformer->transform([], 'test_projection', $this->contextMock);
+        $this->transformer->transform([], $this->contextMock);
     }
 
 
@@ -120,7 +117,6 @@ class DatasetTransformerTest extends TestCase
     public function testTransformAppliesConverterToField(): void
     {
         // Anordnen
-        $projectionName = 'test_projection';
         $rows           = [['title' => 'hello']];
         $step           = new ConversionStep('MyConverter', []);
 
@@ -135,7 +131,7 @@ class DatasetTransformerTest extends TestCase
 
         $this->registryMock
             ->method('getPlan')
-            ->with($projectionName)
+            ->with('test_projection')
             ->willReturn($this->planMock);
 
         $this->locatorMock
@@ -144,7 +140,7 @@ class DatasetTransformerTest extends TestCase
             ->willReturn($converterMock);
 
         // Ausführen
-        $result = $this->transformer->transform($rows, $projectionName, $this->contextMock);
+        $result = $this->transformer->transform($rows, $this->contextMock);
 
         // Assert
         $this->assertSame('HELLO', $result[0]['title']);
@@ -158,7 +154,6 @@ class DatasetTransformerTest extends TestCase
     public function testTransformCallsConverterWithCorrectArguments(): void
     {
         // Anordnen
-        $projectionName = 'test_projection';
         $params         = ['locale' => 'de'];
         $rows           = [['price' => 100]];
         $step           = new ConversionStep('PriceConverter', $params);
@@ -183,7 +178,7 @@ class DatasetTransformerTest extends TestCase
             ->willReturn($converterMock);
 
         // Ausführen
-        $this->transformer->transform($rows, $projectionName, $this->contextMock);
+        $this->transformer->transform($rows, $this->contextMock);
     }
 
 
@@ -195,7 +190,6 @@ class DatasetTransformerTest extends TestCase
     public function testTransformChainsMultipleStepsForSameField(): void
     {
         // Anordnen
-        $projectionName = 'test_projection';
         $rows           = [['value' => 'hello']];
         $step1          = new ConversionStep('ConverterA', []);
         $step2          = new ConversionStep('ConverterB', []);
@@ -227,7 +221,7 @@ class DatasetTransformerTest extends TestCase
             ]);
 
         // Ausführen
-        $result = $this->transformer->transform($rows, $projectionName, $this->contextMock);
+        $result = $this->transformer->transform($rows, $this->contextMock);
 
         // Assert – der Endwert ist das Ergebnis der verketteten Konvertierungen
         $this->assertSame('HELLO!', $result[0]['value']);
@@ -240,7 +234,6 @@ class DatasetTransformerTest extends TestCase
     public function testTransformHandlesMultipleRows(): void
     {
         // Anordnen
-        $projectionName = 'test_projection';
         $rows           = [
             ['name' => 'alice'],
             ['name' => 'bob'],
@@ -265,7 +258,7 @@ class DatasetTransformerTest extends TestCase
             ->willReturn($converterMock);
 
         // Ausführen
-        $result = $this->transformer->transform($rows, $projectionName, $this->contextMock);
+        $result = $this->transformer->transform($rows, $this->contextMock);
 
         // Assert
         $this->assertSame('ALICE', $result[0]['name']);
@@ -280,7 +273,6 @@ class DatasetTransformerTest extends TestCase
     public function testTransformPassesNullForMissingFieldInRow(): void
     {
         // Anordnen
-        $projectionName = 'test_projection';
         $rows           = [['other_field' => 'value']];
         $step           = new ConversionStep('MyConverter', []);
 
@@ -304,7 +296,7 @@ class DatasetTransformerTest extends TestCase
             ->willReturn($converterMock);
 
         // Ausführen
-        $result = $this->transformer->transform($rows, $projectionName, $this->contextMock);
+        $result = $this->transformer->transform($rows, $this->contextMock);
 
         // Assert – das fehlende Feld wird mit null-Wert im Ergebnis gesetzt
         $this->assertNull($result[0]['missing_field']);
@@ -318,7 +310,6 @@ class DatasetTransformerTest extends TestCase
     public function testTransformThrowsLogicExceptionWhenServiceIsNotFieldConverter(): void
     {
         // Anordnen
-        $projectionName = 'test_projection';
         $rows           = [['field' => 'value']];
         $step           = new ConversionStep('InvalidService', []);
 
@@ -342,7 +333,7 @@ class DatasetTransformerTest extends TestCase
         $this->expectExceptionMessage('Service "InvalidService" is not a FieldConverterInterface.');
 
         // Ausführen
-        $this->transformer->transform($rows, $projectionName, $this->contextMock);
+        $this->transformer->transform($rows, $this->contextMock);
     }
 
 
@@ -353,7 +344,6 @@ class DatasetTransformerTest extends TestCase
     public function testTransformCallsPrefetchOnPrefetchingConverter(): void
     {
         // Anordnen
-        $projectionName = 'test_projection';
         $params         = ['ids' => [1, 2, 3]];
         $rows           = [['id' => 1], ['id' => 2]];
         $step           = new ConversionStep('PrefetchingConverter', $params);
@@ -382,7 +372,7 @@ class DatasetTransformerTest extends TestCase
             ->willReturn($prefetchingConverterMock);
 
         // Ausführen
-        $this->transformer->transform($rows, $projectionName, $this->contextMock);
+        $this->transformer->transform($rows, $this->contextMock);
     }
 
 
@@ -393,7 +383,6 @@ class DatasetTransformerTest extends TestCase
     public function testTransformCallsPrefetchOnlyOnceForSameConverterAndParams(): void
     {
         // Anordnen
-        $projectionName = 'test_projection';
         $params         = ['key' => 'value'];
         $rows           = [['field1' => 'a', 'field2' => 'b']];
         $step1          = new ConversionStep('SharedConverter', $params);
@@ -426,7 +415,7 @@ class DatasetTransformerTest extends TestCase
             ->willReturn($prefetchingConverterMock);
 
         // Ausführen
-        $this->transformer->transform($rows, $projectionName, $this->contextMock);
+        $this->transformer->transform($rows, $this->contextMock);
     }
 
 
@@ -437,7 +426,6 @@ class DatasetTransformerTest extends TestCase
     public function testTransformCallsPrefetchTwiceForSameConverterWithDifferentParams(): void
     {
         // Anordnen
-        $projectionName = 'test_projection';
         $params1        = ['locale' => 'de'];
         $params2        = ['locale' => 'en'];
         $rows           = [['field1' => 'a', 'field2' => 'b']];
@@ -471,7 +459,7 @@ class DatasetTransformerTest extends TestCase
             ->willReturn($prefetchingConverterMock);
 
         // Ausführen
-        $this->transformer->transform($rows, $projectionName, $this->contextMock);
+        $this->transformer->transform($rows, $this->contextMock);
     }
 
 
@@ -482,7 +470,6 @@ class DatasetTransformerTest extends TestCase
     public function testTransformDoesNotCallPrefetchForNonPrefetchingConverter(): void
     {
         // Anordnen
-        $projectionName = 'test_projection';
         $rows           = [['field' => 'value']];
         $step           = new ConversionStep('SimpleConverter', []);
 
@@ -505,7 +492,7 @@ class DatasetTransformerTest extends TestCase
             ->willReturn($converterMock);
 
         // Ausführen – darf keine Exception werfen und kein prefetch() aufrufen
-        $result = $this->transformer->transform($rows, $projectionName, $this->contextMock);
+        $result = $this->transformer->transform($rows, $this->contextMock);
 
         // Assert – der Wert bleibt unverändert
         $this->assertSame('value', $result[0]['field']);
@@ -519,7 +506,6 @@ class DatasetTransformerTest extends TestCase
     public function testTransformPreservesFieldsNotInProjectionPlan(): void
     {
         // Anordnen
-        $projectionName = 'test_projection';
         $rows           = [['title' => 'hello', 'untouched' => 'original']];
         $step           = new ConversionStep('MyConverter', []);
 
@@ -541,7 +527,7 @@ class DatasetTransformerTest extends TestCase
             ->willReturn($converterMock);
 
         // Ausführen
-        $result = $this->transformer->transform($rows, $projectionName, $this->contextMock);
+        $result = $this->transformer->transform($rows, $this->contextMock);
 
         // Assert – das nicht transformierte Feld bleibt unverändert
         $this->assertSame('original', $result[0]['untouched']);
@@ -555,6 +541,7 @@ class DatasetTransformerTest extends TestCase
     {
         // Anordnen
         $projectionName = 'my_special_projection';
+        $context        = new ConversionContext($projectionName);
         $rows           = [['field' => 'value']];
 
         $this->planMock
@@ -568,7 +555,7 @@ class DatasetTransformerTest extends TestCase
             ->willReturn($this->planMock);
 
         // Ausführen
-        $this->transformer->transform($rows, $projectionName, $this->contextMock);
+        $this->transformer->transform($rows, $context);
     }
 
 
@@ -578,7 +565,6 @@ class DatasetTransformerTest extends TestCase
     public function testTransformAddsNewFieldViaAddition(): void
     {
         // Anordnen
-        $projectionName = 'test_projection';
         $rows           = [['quantity' => 3, 'unit_price' => 100]];
         $addition       = new FieldAddition('total_price', 'CalcConverter', ['op' => 'multiply'], '');
 
@@ -601,7 +587,7 @@ class DatasetTransformerTest extends TestCase
             ->willReturn($converterMock);
 
         // Ausfuehren
-        $result = $this->transformer->transform($rows, $projectionName, $this->contextMock);
+        $result = $this->transformer->transform($rows, $this->contextMock);
 
         // Assert – das neue Feld ist vorhanden
         $this->assertArrayHasKey('total_price', $result[0]);
@@ -619,7 +605,6 @@ class DatasetTransformerTest extends TestCase
     public function testTransformAdditionUsesSourceFieldValue(): void
     {
         // Anordnen
-        $projectionName = 'test_projection';
         $rows           = [['price' => 100]];
         $addition       = new FieldAddition('formatted_price', 'FormatConverter', ['currency' => 'EUR'], 'price');
 
@@ -644,7 +629,7 @@ class DatasetTransformerTest extends TestCase
             ->willReturn($converterMock);
 
         // Ausfuehren
-        $result = $this->transformer->transform($rows, $projectionName, $this->contextMock);
+        $result = $this->transformer->transform($rows, $this->contextMock);
 
         // Assert
         $this->assertSame('100,00 €', $result[0]['formatted_price']);
@@ -658,7 +643,6 @@ class DatasetTransformerTest extends TestCase
     public function testTransformAdditionPassesNullWhenSourceFieldIsEmpty(): void
     {
         // Anordnen
-        $projectionName = 'test_projection';
         $rows           = [['quantity' => 3, 'unit_price' => 100]];
         $addition       = new FieldAddition('total_price', 'CalcConverter', [], '');
 
@@ -683,7 +667,7 @@ class DatasetTransformerTest extends TestCase
             ->willReturn($converterMock);
 
         // Ausfuehren
-        $this->transformer->transform($rows, $projectionName, $this->contextMock);
+        $this->transformer->transform($rows, $this->contextMock);
     }
 
 
@@ -693,7 +677,6 @@ class DatasetTransformerTest extends TestCase
     public function testTransformRemovesFieldsViaRemoval(): void
     {
         // Anordnen
-        $projectionName = 'test_projection';
         $rows           = [['quantity' => 3, 'unit_price' => 100, 'name' => 'Widget']];
 
         $planMock = $this->createPlanMock([], ['quantity', 'unit_price']);
@@ -706,7 +689,7 @@ class DatasetTransformerTest extends TestCase
             ->willReturn($planMock);
 
         // Ausfuehren
-        $result = $this->transformer->transform($rows, $projectionName, $this->contextMock);
+        $result = $this->transformer->transform($rows, $this->contextMock);
 
         // Assert – entfernte Felder sind nicht mehr vorhanden
         $this->assertArrayNotHasKey('quantity', $result[0]);
@@ -724,7 +707,6 @@ class DatasetTransformerTest extends TestCase
     public function testTransformExecutesConvertThenAddThenRemove(): void
     {
         // Anordnen
-        $projectionName = 'test_projection';
         $rows           = [['quantity' => 3, 'unit_price' => 100]];
         $step           = new ConversionStep('UpperConverter', []);
         $addition       = new FieldAddition('total', 'CalcConverter', [], '');
@@ -756,7 +738,7 @@ class DatasetTransformerTest extends TestCase
             ]);
 
         // Ausfuehren
-        $result = $this->transformer->transform($rows, $projectionName, $this->contextMock);
+        $result = $this->transformer->transform($rows, $this->contextMock);
 
         // Assert – Convert wurde ausgefuehrt
         $this->assertSame(5, $result[0]['quantity']);
@@ -774,7 +756,6 @@ class DatasetTransformerTest extends TestCase
     public function testTransformCallsPrefetchOnAdditionConverter(): void
     {
         // Anordnen
-        $projectionName = 'test_projection';
         $params         = ['lookup' => true];
         $rows           = [['id' => 1]];
         $addition       = new FieldAddition('label', 'PrefetchingConverter', $params, 'id');
@@ -803,7 +784,7 @@ class DatasetTransformerTest extends TestCase
             ->willReturn($prefetchingConverterMock);
 
         // Ausfuehren
-        $this->transformer->transform($rows, $projectionName, $this->contextMock);
+        $this->transformer->transform($rows, $this->contextMock);
     }
 
 
@@ -815,7 +796,6 @@ class DatasetTransformerTest extends TestCase
     public function testTransformDeduplicatesPrefetchAcrossStepsAndAdditions(): void
     {
         // Anordnen
-        $projectionName = 'test_projection';
         $params         = ['key' => 'value'];
         $rows           = [['field1' => 'a']];
         $step           = new ConversionStep('SharedConverter', $params);
@@ -846,7 +826,7 @@ class DatasetTransformerTest extends TestCase
             ->willReturn($prefetchingConverterMock);
 
         // Ausfuehren
-        $this->transformer->transform($rows, $projectionName, $this->contextMock);
+        $this->transformer->transform($rows, $this->contextMock);
     }
 
 
@@ -856,7 +836,6 @@ class DatasetTransformerTest extends TestCase
     public function testTransformHandlesMultipleRowsWithAdditionsAndRemovals(): void
     {
         // Anordnen
-        $projectionName = 'test_projection';
         $rows           = [
             ['name' => 'alice', 'age' => 30],
             ['name' => 'bob', 'age' => 25],
@@ -882,7 +861,7 @@ class DatasetTransformerTest extends TestCase
             ->willReturn($converterMock);
 
         // Ausfuehren
-        $result = $this->transformer->transform($rows, $projectionName, $this->contextMock);
+        $result = $this->transformer->transform($rows, $this->contextMock);
 
         // Assert – Additions
         $this->assertSame('Hello alice', $result[0]['greeting']);
@@ -903,7 +882,6 @@ class DatasetTransformerTest extends TestCase
     public function testAdditionCanAccessConvertedValues(): void
     {
         // Anordnen
-        $projectionName = 'test_projection';
         $rows           = [['price' => 100]];
         $step           = new ConversionStep('DoubleConverter', []);
         $addition       = new FieldAddition('formatted', 'FormatConverter', [], 'price');
@@ -937,7 +915,7 @@ class DatasetTransformerTest extends TestCase
             ]);
 
         // Ausfuehren
-        $result = $this->transformer->transform($rows, $projectionName, $this->contextMock);
+        $result = $this->transformer->transform($rows, $this->contextMock);
 
         // Assert – Convert wurde ausgefuehrt
         $this->assertSame(200, $result[0]['price']);

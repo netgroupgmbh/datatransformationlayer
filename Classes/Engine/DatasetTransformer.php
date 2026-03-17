@@ -38,20 +38,19 @@ class DatasetTransformer
 
     /**
      * @param array<int, array<string, mixed>> $rows
-     * @param string                           $projectionName
      * @param ConversionContext                $context
      *
      * @return array<int, array<string, mixed>>
      *
      * @throws \JsonException
      */
-    public function transform(array $rows, string $projectionName, ConversionContext $context): array
+    public function transform(array $rows, ConversionContext $context): array
     {
         if ([] === $rows) {
             return [];
         }
 
-        $plan = $this->projectionRegistry->getPlan($projectionName);
+        $plan = $this->projectionRegistry->getPlan($context->projection);
 
         // 1) Prefetch (dedupliziert nach ConverterClass + Params)
         $prefetched = [];

@@ -289,7 +289,7 @@ final class MemberController extends AbstractController
             options: ['timezone' => 'Europe/Berlin']
         );
 
-        $rows = $this->transformer->transform($rows, 'member_list', $context);
+        $rows = $this->transformer->transform($rows, $context);
 
         return $this->render('member/list.html.twig', [
             'rows' => $rows,
