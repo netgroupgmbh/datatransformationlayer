@@ -16,8 +16,7 @@
     },
     "require": {
         "php": "^8.3",
-        "contao/core-bundle": "^5.3",
-        "netgroup/contaotoolkit": "^2.1"
+        "contao/core-bundle": "^5.3"
     },
     "require-dev": {
         "contao/test-case": "^5.3",
