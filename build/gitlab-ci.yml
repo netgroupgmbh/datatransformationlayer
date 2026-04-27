@@ -86,6 +86,7 @@ test_cto5.3_php8.5:
         - ./build/runtests.sh
     coverage: '/Methods: \d+\.\d+/'
 
+
 test_cto5.7_php8.3:
     stage: test_cto5.7
     rules:

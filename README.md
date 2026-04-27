@@ -8,6 +8,30 @@ Eine schlanke **Data Transformation Layer** für Contao-Bundles: Du definierst *
 
 ---
 
+
+## Autor
+
+**NetGroup GmbH** - Patrick Froch <info@netgroup.de>
+
+---
+
+
+## Support
+
+NetGroup Gesellschaft für Informationstechnologien in Deutschland mbH<br>
+Kaiserstraße 67<br>
+44135 Dortmund
+
+Kontakt:<br>
+Telefon: +49 231 557509-0<br>
+Telefax: +49 231 557509-99<br>
+E-Mail: info@netgroup.de
+
+Internet: https://www.netgroup.de/userguide.html
+
+---
+
+
 ## Inhalt
 
 - [Motivation](#motivation)
