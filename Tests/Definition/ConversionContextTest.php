@@ -15,8 +15,10 @@ declare(strict_types=1);
 namespace NetGroup\DataTransformationLayer\Tests\Definition;
 
 use NetGroup\DataTransformationLayer\Classes\Definition\ConversionContext;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\TestCase;
 
+#[AllowMockObjectsWithoutExpectations]
 class ConversionContextTest extends TestCase
 {
 

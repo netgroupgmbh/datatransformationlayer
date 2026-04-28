@@ -17,9 +17,11 @@ namespace NetGroup\DataTransformationLayer\Tests\Definition;
 use NetGroup\DataTransformationLayer\Classes\Definition\ConversionStep;
 use NetGroup\DataTransformationLayer\Classes\Definition\FieldAddition;
 use NetGroup\DataTransformationLayer\Classes\Definition\ProjectionPlan;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
+#[AllowMockObjectsWithoutExpectations]
 class ProjectionPlanTest extends TestCase
 {
 

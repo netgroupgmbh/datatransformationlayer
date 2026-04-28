@@ -19,9 +19,11 @@ use NetGroup\DataTransformationLayer\Classes\Definition\ProjectionPlanBuilder;
 use NetGroup\DataTransformationLayer\Classes\Engine\ProjectionRegistry;
 use NetGroup\DataTransformationLayer\Classes\Projection\ProjectionInterface;
 use NetGroup\DataTransformationLayer\Classes\Services\Factories\DefinitionFactory;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
+#[AllowMockObjectsWithoutExpectations]
 class ProjectionRegistryTest extends TestCase
 {
 

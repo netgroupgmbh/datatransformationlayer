@@ -18,9 +18,11 @@ use NetGroup\DataTransformationLayer\Classes\Definition\FieldAddition;
 use NetGroup\DataTransformationLayer\Classes\Definition\FieldAdditionBuilder;
 use NetGroup\DataTransformationLayer\Classes\Definition\ProjectionPlan;
 use NetGroup\DataTransformationLayer\Classes\Services\Factories\DefinitionFactory;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
+#[AllowMockObjectsWithoutExpectations]
 class FieldAdditionBuilderTest extends TestCase
 {
 

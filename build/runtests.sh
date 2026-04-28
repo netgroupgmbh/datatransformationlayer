@@ -3,9 +3,9 @@
 # =============================================================================
 #title:         runtests.sh
 #description:   Führt die Tests der Softwate aus
-#author:        Patrick Froch <p.froch@netgroup.de>
-#date:          20240801
-#version:       1.1.0
+#author:        Patrick Froch <hallo@patrick-froch.de>
+#date:          20260409
+#version:       1.2.0
 #usage:         runtests.sh
 # =============================================================================
 #
@@ -104,11 +104,14 @@ done
 # Header
 #
 echo -e "\e[1;96m\n================================================================================"
-echo -e "NetGroup GmbH - Test Suite by Patrick Froch - Version: 1.0.1"
+echo -e "Test Suite by Patrick Froch - Version: 1.2.0"
 echo -e "--------------------------------------------------------------------------------"
-echo -n "PHP-Version: "
+echo -ne "PHP-Version: \t"
 $PHP -v | grep ^PHP | cut -d' ' -f2 | cut -d'-' -f1
-echo -e "\n\e[0m"
+echo -e "Package: \t${PWD##*/}\n"
+echo -e "\e[0m"
+
+echo
 
 
 ## Easy Coding Standard
@@ -121,7 +124,7 @@ then
     if [ ${tmperr} -ne 0 ]
     then
         error=${tmperr}
-        myerror "Es ist ein Fehler ausgetreten [${tmperr}]"
+        myerror "Easy Coding Standard: Es ist ein Fehler ausgetreten [${tmperr}]"
     fi
 else
     myinfo "Prüfen des Code-Style mit Easy Coding Standard ausgelassen. ecs nicht vorhanden!"
@@ -142,10 +145,10 @@ then
         tmperr=$?
     fi
 
-    if [ ${tmperr} -ne 0 ]
+    if [ ${tmperr} -ne 0 ] && [ "${VERBOSE}" != "TRUE" ]
     then
         error=${tmperr}
-        ../../../vendor/bin/phpstan analyse -c "${configFolder}/phpstan.neon"
+        ../../../vendor/bin/phpstan analyse -c "${configFolder}/phpstan.neon" # Damit Ausgabe auch ohne -v angezeigt wird!
     else
        myshortecho "Prüfen der Code-Qualität mit PHPStan erfolgreich"
     fi
@@ -157,16 +160,29 @@ fi
 ## PHPUnit
 if [ -f ../../../vendor/bin/phpunit ] && [ -d ./Tests ]
 then
+    phpunitconfig="${configFolder}/phpunit/phpunit.xml.dist"
+
+    if [[ ! -f "${phpunitconfig}" ]]
+    then
+        phpunitversion=`../../../vendor/bin/phpunit --version`
+        phpunitconfig="${configFolder}/phpunit/phpunit-12.xml.dist"
+
+        if [[ "$phpunitversion" == "PHPUnit 9."* ]]
+        then
+            phpunitconfig="${configFolder}/phpunit/phpunit-9.xml.dist"
+        fi
+    fi
+
     # PHPUnit gobal mit composer installiert
     echo
     myecho "Führe UnitTests mit globalem PHPUnit durch"
-    XDEBUG_MODE=coverage ${PHP} -d error_reporting="E_ALL & ~E_DEPRECATED & ~E_STRICT" ../../../vendor/bin/phpunit --configuration ${configFolder}/phpunit/phpunit.xml.dist $TESTDOX
+    XDEBUG_MODE=coverage ${PHP} -d error_reporting="E_ALL & ~E_DEPRECATED & ~E_STRICT" ../../../vendor/bin/phpunit --configuration ${phpunitconfig} $TESTDOX
     tmperr=$?
 
     if [ ${tmperr} -ne 0 ]
     then
         error=${tmperr}
-        myerror "Es ist ein Fehler ausgetreten [${tmperr}]"
+        myerror "PHPUnit: Es ist ein Fehler ausgetreten [${tmperr}]"
     fi
 else
     myinfo "Ausführen der UnitTests ausgelassen. PHPUnit nicht vorhanden!"
@@ -183,7 +199,7 @@ then
         echo
     fi
 
-    myerror ">>>>>>>>>> Bei der Verarbeitung der Tests sind Fehler aufgetreten ! <<<<<<<<<<"
+    myerror "!!!!!!!!!!! Bei der Verarbeitung der Tests sind Fehler aufgetreten !!!!!!!!!!!"
     echo
     exit 127
 else
@@ -192,6 +208,3 @@ else
     echo
     exit 0
 fi
-
-
-

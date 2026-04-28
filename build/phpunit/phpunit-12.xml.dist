@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="../../../../../vendor/phpunit/phpunit/phpunit.xsd"
+         backupGlobals="false"
+         colors="true"
+         bootstrap="bootstrap.php"
+>
+    <!-- Source -->
+    <source>
+        <include>
+            <directory suffix=".php">../../Classes/</directory>
+        </include>
+        <exclude>
+            <directory>../../Classes/Contao/</directory>
+        </exclude>
+    </source>
+
+    <!-- Coverage -->
+    <coverage>
+        <report>
+            <html outputDirectory="/tmp/coverage" lowUpperBound="35" highLowerBound="70"/>
+            <text outputFile="php://stdout" showUncoveredFiles="false" showOnlySummary="true"/>
+        </report>
+    </coverage>
+
+    <!-- Tests -->
+    <testsuites>
+        <testsuite name="esitTestSuite">
+            <directory>../../Tests/</directory>
+        </testsuite>
+    </testsuites>
+</phpunit>

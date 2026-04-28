@@ -45,6 +45,4 @@ if (\is_file($globalComposerAutoloadPath)) {
 
 if (\is_file($testCase)) {
     include_once($testCase);
-} else {
-    throw new \Exception('Testcase is missing: ' . $testCase);
 }

@@ -22,10 +22,12 @@ use NetGroup\DataTransformationLayer\Classes\Definition\FieldAddition;
 use NetGroup\DataTransformationLayer\Classes\Definition\ProjectionPlan;
 use NetGroup\DataTransformationLayer\Classes\Engine\DatasetTransformer;
 use NetGroup\DataTransformationLayer\Classes\Engine\ProjectionRegistry;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 
+#[AllowMockObjectsWithoutExpectations]
 class DatasetTransformerTest extends TestCase
 {
 

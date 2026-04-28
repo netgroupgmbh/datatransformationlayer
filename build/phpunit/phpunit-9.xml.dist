@@ -22,7 +22,7 @@
 
     <!-- Tests -->
     <testsuites>
-        <testsuite name="netGroupTestSuite">
+        <testsuite name="esitTestSuite">
             <directory>../../Tests/</directory>
         </testsuite>
     </testsuites>
