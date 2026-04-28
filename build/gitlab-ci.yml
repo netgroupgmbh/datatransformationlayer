@@ -14,10 +14,10 @@ variables:
 
 stages:
     - test_cto5.3
-    #- test_cto5.4
-    #- test_cto5.5
-    #- test_cto5.6
-    #- test_cto5.7
+    - test_cto5.4
+    - test_cto5.5
+    - test_cto5.6
+    - test_cto5.7
 
 
 test_cto5.3_php8.3:
@@ -96,305 +96,305 @@ test_cto5.3_php8.5:
     coverage: '/Methods: \d+\.\d+/'
 
 
-#test_cto5.4_php8.3:
-#    stage: test_cto5.4
-#    rules:
-#        -   if: $CI_COMMIT_BRANCH == "main"
-#            when: on_success
-#        -   if: $CI_COMMIT_BRANCH == "nightly"
-#            when: on_success
-#        -   if: $CI_COMMIT_BRANCH == "dev"
-#            when: on_success
-#        -   if: $CI_PIPELINE_SOURCE == "merge_request_event"
-#            when: on_success
-#        -   if: $CI_BUILD_TAG
-#            when: never
-#        -   if: $CI_COMMIT_BRANCH == "/dev-*/"
-#            when: never
-#    image: registry.netgroup.de/testsuite_cto5.4_php8.3:2.0.0
-#    before_script:
-#        - COMPOSER_MEMORY_LIMIT=-1 /usr/local/bin/composer.phar config repositories.composer composer $TEST_PACKAGE_URL --working-dir=/htdocs/
-#        - COMPOSER_MEMORY_LIMIT=-1 /usr/local/bin/composer.phar config repositories.testproject vcs $TEST_PROJECT_URL --working-dir=/htdocs/
-#        - COMPOSER_MEMORY_LIMIT=-1 /usr/local/bin/composer.phar require $PROJECT_NAME:dev-$CI_COMMIT_REF_NAME --working-dir=/htdocs/
-#    script:
-#        - cd /htdocs/vendor/$PROJECT_NAME/
-#        - ./build/runtests.sh
-#    coverage: '/Methods: \d+\.\d+/'
-#
-#test_cto5.4_php8.4:
-#    stage: test_cto5.4
-#    rules:
-#        -   if: $CI_COMMIT_BRANCH == "main"
-#            when: on_success
-#        -   if: $CI_COMMIT_BRANCH == "nightly"
-#            when: on_success
-#        -   if: $CI_COMMIT_BRANCH == "dev"
-#            when: on_success
-#        -   if: $CI_PIPELINE_SOURCE == "merge_request_event"
-#            when: on_success
-#        -   if: $CI_BUILD_TAG
-#            when: never
-#        -   if: $CI_COMMIT_BRANCH == "/dev-*/"
-#            when: never
-#    image: registry.netgroup.de/testsuite_cto5.4_php8.4:2.0.0
-#    before_script:
-#        - COMPOSER_MEMORY_LIMIT=-1 /usr/local/bin/composer.phar config repositories.composer composer $TEST_PACKAGE_URL --working-dir=/htdocs/
-#        - COMPOSER_MEMORY_LIMIT=-1 /usr/local/bin/composer.phar config repositories.testproject vcs $TEST_PROJECT_URL --working-dir=/htdocs/
-#        - COMPOSER_MEMORY_LIMIT=-1 /usr/local/bin/composer.phar require $PROJECT_NAME:dev-$CI_COMMIT_REF_NAME --working-dir=/htdocs/
-#    script:
-#        - cd /htdocs/vendor/$PROJECT_NAME/
-#        - ./build/runtests.sh
-#    coverage: '/Methods: \d+\.\d+/'
-#
-#test_cto5.4_php8.5:
-#    stage: test_cto5.4
-#    rules:
-#        -   if: $CI_COMMIT_BRANCH == "main"
-#            when: on_success
-#        -   if: $CI_COMMIT_BRANCH == "nightly"
-#            when: on_success
-#        -   if: $CI_COMMIT_BRANCH == "dev"
-#            when: on_success
-#        -   if: $CI_PIPELINE_SOURCE == "merge_request_event"
-#            when: on_success
-#        -   if: $CI_BUILD_TAG
-#            when: never
-#        -   if: $CI_COMMIT_BRANCH == "/dev-*/"
-#            when: never
-#    image: registry.netgroup.de/testsuite_cto5.4_php8.5:2.0.0
-#    before_script:
-#        - COMPOSER_MEMORY_LIMIT=-1 /usr/local/bin/composer.phar config repositories.composer composer $TEST_PACKAGE_URL --working-dir=/htdocs/
-#        - COMPOSER_MEMORY_LIMIT=-1 /usr/local/bin/composer.phar config repositories.testproject vcs $TEST_PROJECT_URL --working-dir=/htdocs/
-#        - COMPOSER_MEMORY_LIMIT=-1 /usr/local/bin/composer.phar require $PROJECT_NAME:dev-$CI_COMMIT_REF_NAME --working-dir=/htdocs/
-#    script:
-#        - cd /htdocs/vendor/$PROJECT_NAME/
-#        - ./build/runtests.sh
-#    coverage: '/Methods: \d+\.\d+/'
-#
-#
-#test_cto5.5_php8.3:
-#    stage: test_cto5.5
-#    rules:
-#        -   if: $CI_COMMIT_BRANCH == "main"
-#            when: on_success
-#        -   if: $CI_COMMIT_BRANCH == "nightly"
-#            when: on_success
-#        -   if: $CI_COMMIT_BRANCH == "dev"
-#            when: on_success
-#        -   if: $CI_PIPELINE_SOURCE == "merge_request_event"
-#            when: on_success
-#        -   if: $CI_BUILD_TAG
-#            when: never
-#        -   if: $CI_COMMIT_BRANCH == "/dev-*/"
-#            when: never
-#    image: registry.netgroup.de/testsuite_cto5.5_php8.3:2.0.0
-#    before_script:
-#        - COMPOSER_MEMORY_LIMIT=-1 /usr/local/bin/composer.phar config repositories.composer composer $TEST_PACKAGE_URL --working-dir=/htdocs/
-#        - COMPOSER_MEMORY_LIMIT=-1 /usr/local/bin/composer.phar config repositories.testproject vcs $TEST_PROJECT_URL --working-dir=/htdocs/
-#        - COMPOSER_MEMORY_LIMIT=-1 /usr/local/bin/composer.phar require $PROJECT_NAME:dev-$CI_COMMIT_REF_NAME --working-dir=/htdocs/
-#    script:
-#        - cd /htdocs/vendor/$PROJECT_NAME/
-#        - ./build/runtests.sh
-#    coverage: '/Methods: \d+\.\d+/'
-#
-#test_cto5.5_php8.4:
-#    stage: test_cto5.5
-#    rules:
-#        -   if: $CI_COMMIT_BRANCH == "main"
-#            when: on_success
-#        -   if: $CI_COMMIT_BRANCH == "nightly"
-#            when: on_success
-#        -   if: $CI_COMMIT_BRANCH == "dev"
-#            when: on_success
-#        -   if: $CI_PIPELINE_SOURCE == "merge_request_event"
-#            when: on_success
-#        -   if: $CI_BUILD_TAG
-#            when: never
-#        -   if: $CI_COMMIT_BRANCH == "/dev-*/"
-#            when: never
-#    image: registry.netgroup.de/testsuite_cto5.5_php8.4:2.0.0
-#    before_script:
-#        - COMPOSER_MEMORY_LIMIT=-1 /usr/local/bin/composer.phar config repositories.composer composer $TEST_PACKAGE_URL --working-dir=/htdocs/
-#        - COMPOSER_MEMORY_LIMIT=-1 /usr/local/bin/composer.phar config repositories.testproject vcs $TEST_PROJECT_URL --working-dir=/htdocs/
-#        - COMPOSER_MEMORY_LIMIT=-1 /usr/local/bin/composer.phar require $PROJECT_NAME:dev-$CI_COMMIT_REF_NAME --working-dir=/htdocs/
-#    script:
-#        - cd /htdocs/vendor/$PROJECT_NAME/
-#        - ./build/runtests.sh
-#    coverage: '/Methods: \d+\.\d+/'
-#
-#test_cto5.5_php8.5:
-#    stage: test_cto5.5
-#    rules:
-#        -   if: $CI_COMMIT_BRANCH == "main"
-#            when: on_success
-#        -   if: $CI_COMMIT_BRANCH == "nightly"
-#            when: on_success
-#        -   if: $CI_COMMIT_BRANCH == "dev"
-#            when: on_success
-#        -   if: $CI_PIPELINE_SOURCE == "merge_request_event"
-#            when: on_success
-#        -   if: $CI_BUILD_TAG
-#            when: never
-#        -   if: $CI_COMMIT_BRANCH == "/dev-*/"
-#            when: never
-#    image: registry.netgroup.de/testsuite_cto5.5_php8.5:2.0.0
-#    before_script:
-#        - COMPOSER_MEMORY_LIMIT=-1 /usr/local/bin/composer.phar config repositories.composer composer $TEST_PACKAGE_URL --working-dir=/htdocs/
-#        - COMPOSER_MEMORY_LIMIT=-1 /usr/local/bin/composer.phar config repositories.testproject vcs $TEST_PROJECT_URL --working-dir=/htdocs/
-#        - COMPOSER_MEMORY_LIMIT=-1 /usr/local/bin/composer.phar require $PROJECT_NAME:dev-$CI_COMMIT_REF_NAME --working-dir=/htdocs/
-#    script:
-#        - cd /htdocs/vendor/$PROJECT_NAME/
-#        - ./build/runtests.sh
-#    coverage: '/Methods: \d+\.\d+/'
-#
-#
-#test_cto5.6_php8.3:
-#    stage: test_cto5.6
-#    rules:
-#        -   if: $CI_COMMIT_BRANCH == "main"
-#            when: on_success
-#        -   if: $CI_COMMIT_BRANCH == "nightly"
-#            when: on_success
-#        -   if: $CI_COMMIT_BRANCH == "dev"
-#            when: on_success
-#        -   if: $CI_PIPELINE_SOURCE == "merge_request_event"
-#            when: on_success
-#        -   if: $CI_BUILD_TAG
-#            when: never
-#        -   if: $CI_COMMIT_BRANCH == "/dev-*/"
-#            when: never
-#    image: registry.netgroup.de/testsuite_cto5.6_php8.3:2.0.0
-#    before_script:
-#        - COMPOSER_MEMORY_LIMIT=-1 /usr/local/bin/composer.phar config repositories.composer composer $TEST_PACKAGE_URL --working-dir=/htdocs/
-#        - COMPOSER_MEMORY_LIMIT=-1 /usr/local/bin/composer.phar config repositories.testproject vcs $TEST_PROJECT_URL --working-dir=/htdocs/
-#        - COMPOSER_MEMORY_LIMIT=-1 /usr/local/bin/composer.phar require $PROJECT_NAME:dev-$CI_COMMIT_REF_NAME --working-dir=/htdocs/
-#    script:
-#        - cd /htdocs/vendor/$PROJECT_NAME/
-#        - ./build/runtests.sh
-#    coverage: '/Methods: \d+\.\d+/'
-#
-#test_cto5.6_php8.4:
-#    stage: test_cto5.6
-#    rules:
-#        -   if: $CI_COMMIT_BRANCH == "main"
-#            when: on_success
-#        -   if: $CI_COMMIT_BRANCH == "nightly"
-#            when: on_success
-#        -   if: $CI_COMMIT_BRANCH == "dev"
-#            when: on_success
-#        -   if: $CI_PIPELINE_SOURCE == "merge_request_event"
-#            when: on_success
-#        -   if: $CI_BUILD_TAG
-#            when: never
-#        -   if: $CI_COMMIT_BRANCH == "/dev-*/"
-#            when: never
-#    image: registry.netgroup.de/testsuite_cto5.6_php8.4:2.0.0
-#    before_script:
-#        - COMPOSER_MEMORY_LIMIT=-1 /usr/local/bin/composer.phar config repositories.composer composer $TEST_PACKAGE_URL --working-dir=/htdocs/
-#        - COMPOSER_MEMORY_LIMIT=-1 /usr/local/bin/composer.phar config repositories.testproject vcs $TEST_PROJECT_URL --working-dir=/htdocs/
-#        - COMPOSER_MEMORY_LIMIT=-1 /usr/local/bin/composer.phar require $PROJECT_NAME:dev-$CI_COMMIT_REF_NAME --working-dir=/htdocs/
-#    script:
-#        - cd /htdocs/vendor/$PROJECT_NAME/
-#        - ./build/runtests.sh
-#    coverage: '/Methods: \d+\.\d+/'
-#
-#test_cto5.6_php8.5:
-#    stage: test_cto5.6
-#    rules:
-#        -   if: $CI_COMMIT_BRANCH == "main"
-#            when: on_success
-#        -   if: $CI_COMMIT_BRANCH == "nightly"
-#            when: on_success
-#        -   if: $CI_COMMIT_BRANCH == "dev"
-#            when: on_success
-#        -   if: $CI_PIPELINE_SOURCE == "merge_request_event"
-#            when: on_success
-#        -   if: $CI_BUILD_TAG
-#            when: never
-#        -   if: $CI_COMMIT_BRANCH == "/dev-*/"
-#            when: never
-#    image: registry.netgroup.de/testsuite_cto5.6_php8.5:2.0.0
-#    before_script:
-#        - COMPOSER_MEMORY_LIMIT=-1 /usr/local/bin/composer.phar config repositories.composer composer $TEST_PACKAGE_URL --working-dir=/htdocs/
-#        - COMPOSER_MEMORY_LIMIT=-1 /usr/local/bin/composer.phar config repositories.testproject vcs $TEST_PROJECT_URL --working-dir=/htdocs/
-#        - COMPOSER_MEMORY_LIMIT=-1 /usr/local/bin/composer.phar require $PROJECT_NAME:dev-$CI_COMMIT_REF_NAME --working-dir=/htdocs/
-#    script:
-#        - cd /htdocs/vendor/$PROJECT_NAME/
-#        - ./build/runtests.sh
-#    coverage: '/Methods: \d+\.\d+/'
-#
-#
-#test_cto5.7_php8.3:
-#    stage: test_cto5.7
-#    rules:
-#        -   if: $CI_COMMIT_BRANCH == "main"
-#            when: on_success
-#        -   if: $CI_COMMIT_BRANCH == "nightly"
-#            when: on_success
-#        -   if: $CI_COMMIT_BRANCH == "dev"
-#            when: on_success
-#        -   if: $CI_PIPELINE_SOURCE == "merge_request_event"
-#            when: on_success
-#        -   if: $CI_BUILD_TAG
-#            when: never
-#        -   if: $CI_COMMIT_BRANCH == "/dev-*/"
-#            when: never
-#    image: registry.netgroup.de/testsuite_cto5.7_php8.3:2.0.0
-#    before_script:
-#        - COMPOSER_MEMORY_LIMIT=-1 /usr/local/bin/composer.phar config repositories.composer composer $TEST_PACKAGE_URL --working-dir=/htdocs/
-#        - COMPOSER_MEMORY_LIMIT=-1 /usr/local/bin/composer.phar config repositories.testproject vcs $TEST_PROJECT_URL --working-dir=/htdocs/
-#        - COMPOSER_MEMORY_LIMIT=-1 /usr/local/bin/composer.phar require $PROJECT_NAME:dev-$CI_COMMIT_REF_NAME --working-dir=/htdocs/
-#    script:
-#        - cd /htdocs/vendor/$PROJECT_NAME/
-#        - ./build/runtests.sh
-#    coverage: '/Methods: \d+\.\d+/'
-#
-#test_cto5.7_php8.4:
-#    stage: test_cto5.7
-#    rules:
-#        -   if: $CI_COMMIT_BRANCH == "main"
-#            when: on_success
-#        -   if: $CI_COMMIT_BRANCH == "nightly"
-#            when: on_success
-#        -   if: $CI_COMMIT_BRANCH == "dev"
-#            when: on_success
-#        -   if: $CI_PIPELINE_SOURCE == "merge_request_event"
-#            when: on_success
-#        -   if: $CI_BUILD_TAG
-#            when: never
-#        -   if: $CI_COMMIT_BRANCH == "/dev-*/"
-#            when: never
-#    image: registry.netgroup.de/testsuite_cto5.7_php8.4:2.0.0
-#    before_script:
-#        - COMPOSER_MEMORY_LIMIT=-1 /usr/local/bin/composer.phar config repositories.composer composer $TEST_PACKAGE_URL --working-dir=/htdocs/
-#        - COMPOSER_MEMORY_LIMIT=-1 /usr/local/bin/composer.phar config repositories.testproject vcs $TEST_PROJECT_URL --working-dir=/htdocs/
-#        - COMPOSER_MEMORY_LIMIT=-1 /usr/local/bin/composer.phar require $PROJECT_NAME:dev-$CI_COMMIT_REF_NAME --working-dir=/htdocs/
-#    script:
-#        - cd /htdocs/vendor/$PROJECT_NAME/
-#        - ./build/runtests.sh
-#    coverage: '/Methods: \d+\.\d+/'
-#
-#test_cto5.7_php8.5:
-#    stage: test_cto5.7
-#    rules:
-#        -   if: $CI_COMMIT_BRANCH == "main"
-#            when: on_success
-#        -   if: $CI_COMMIT_BRANCH == "nightly"
-#            when: on_success
-#        -   if: $CI_COMMIT_BRANCH == "dev"
-#            when: on_success
-#        -   if: $CI_PIPELINE_SOURCE == "merge_request_event"
-#            when: on_success
-#        -   if: $CI_BUILD_TAG
-#            when: never
-#        -   if: $CI_COMMIT_BRANCH == "/dev-*/"
-#            when: never
-#    image: registry.netgroup.de/testsuite_cto5.7_php8.5:2.0.0
-#    before_script:
-#        - COMPOSER_MEMORY_LIMIT=-1 /usr/local/bin/composer.phar config repositories.composer composer $TEST_PACKAGE_URL --working-dir=/htdocs/
-#        - COMPOSER_MEMORY_LIMIT=-1 /usr/local/bin/composer.phar config repositories.testproject vcs $TEST_PROJECT_URL --working-dir=/htdocs/
-#        - COMPOSER_MEMORY_LIMIT=-1 /usr/local/bin/composer.phar require $PROJECT_NAME:dev-$CI_COMMIT_REF_NAME --working-dir=/htdocs/
-#    script:
-#        - cd /htdocs/vendor/$PROJECT_NAME/
-#        - ./build/runtests.sh
-#    coverage: '/Methods: \d+\.\d+/'
+test_cto5.4_php8.3:
+    stage: test_cto5.4
+    rules:
+        -   if: $CI_COMMIT_BRANCH == "main"
+            when: on_success
+        -   if: $CI_COMMIT_BRANCH == "nightly"
+            when: on_success
+        -   if: $CI_COMMIT_BRANCH == "dev"
+            when: on_success
+        -   if: $CI_PIPELINE_SOURCE == "merge_request_event"
+            when: on_success
+        -   if: $CI_BUILD_TAG
+            when: never
+        -   if: $CI_COMMIT_BRANCH == "/dev-*/"
+            when: never
+    image: registry.netgroup.de/testsuite_cto5.4_php8.3:2.0.0
+    before_script:
+        - COMPOSER_MEMORY_LIMIT=-1 /usr/local/bin/composer.phar config repositories.composer composer $TEST_PACKAGE_URL --working-dir=/htdocs/
+        - COMPOSER_MEMORY_LIMIT=-1 /usr/local/bin/composer.phar config repositories.testproject vcs $TEST_PROJECT_URL --working-dir=/htdocs/
+        - COMPOSER_MEMORY_LIMIT=-1 /usr/local/bin/composer.phar require $PROJECT_NAME:dev-$CI_COMMIT_REF_NAME --working-dir=/htdocs/
+    script:
+        - cd /htdocs/vendor/$PROJECT_NAME/
+        - ./build/runtests.sh
+    coverage: '/Methods: \d+\.\d+/'
+
+test_cto5.4_php8.4:
+    stage: test_cto5.4
+    rules:
+        -   if: $CI_COMMIT_BRANCH == "main"
+            when: on_success
+        -   if: $CI_COMMIT_BRANCH == "nightly"
+            when: on_success
+        -   if: $CI_COMMIT_BRANCH == "dev"
+            when: on_success
+        -   if: $CI_PIPELINE_SOURCE == "merge_request_event"
+            when: on_success
+        -   if: $CI_BUILD_TAG
+            when: never
+        -   if: $CI_COMMIT_BRANCH == "/dev-*/"
+            when: never
+    image: registry.netgroup.de/testsuite_cto5.4_php8.4:2.0.0
+    before_script:
+        - COMPOSER_MEMORY_LIMIT=-1 /usr/local/bin/composer.phar config repositories.composer composer $TEST_PACKAGE_URL --working-dir=/htdocs/
+        - COMPOSER_MEMORY_LIMIT=-1 /usr/local/bin/composer.phar config repositories.testproject vcs $TEST_PROJECT_URL --working-dir=/htdocs/
+        - COMPOSER_MEMORY_LIMIT=-1 /usr/local/bin/composer.phar require $PROJECT_NAME:dev-$CI_COMMIT_REF_NAME --working-dir=/htdocs/
+    script:
+        - cd /htdocs/vendor/$PROJECT_NAME/
+        - ./build/runtests.sh
+    coverage: '/Methods: \d+\.\d+/'
+
+test_cto5.4_php8.5:
+    stage: test_cto5.4
+    rules:
+        -   if: $CI_COMMIT_BRANCH == "main"
+            when: on_success
+        -   if: $CI_COMMIT_BRANCH == "nightly"
+            when: on_success
+        -   if: $CI_COMMIT_BRANCH == "dev"
+            when: on_success
+        -   if: $CI_PIPELINE_SOURCE == "merge_request_event"
+            when: on_success
+        -   if: $CI_BUILD_TAG
+            when: never
+        -   if: $CI_COMMIT_BRANCH == "/dev-*/"
+            when: never
+    image: registry.netgroup.de/testsuite_cto5.4_php8.5:2.0.0
+    before_script:
+        - COMPOSER_MEMORY_LIMIT=-1 /usr/local/bin/composer.phar config repositories.composer composer $TEST_PACKAGE_URL --working-dir=/htdocs/
+        - COMPOSER_MEMORY_LIMIT=-1 /usr/local/bin/composer.phar config repositories.testproject vcs $TEST_PROJECT_URL --working-dir=/htdocs/
+        - COMPOSER_MEMORY_LIMIT=-1 /usr/local/bin/composer.phar require $PROJECT_NAME:dev-$CI_COMMIT_REF_NAME --working-dir=/htdocs/
+    script:
+        - cd /htdocs/vendor/$PROJECT_NAME/
+        - ./build/runtests.sh
+    coverage: '/Methods: \d+\.\d+/'
+
+
+test_cto5.5_php8.3:
+    stage: test_cto5.5
+    rules:
+        -   if: $CI_COMMIT_BRANCH == "main"
+            when: on_success
+        -   if: $CI_COMMIT_BRANCH == "nightly"
+            when: on_success
+        -   if: $CI_COMMIT_BRANCH == "dev"
+            when: on_success
+        -   if: $CI_PIPELINE_SOURCE == "merge_request_event"
+            when: on_success
+        -   if: $CI_BUILD_TAG
+            when: never
+        -   if: $CI_COMMIT_BRANCH == "/dev-*/"
+            when: never
+    image: registry.netgroup.de/testsuite_cto5.5_php8.3:2.0.0
+    before_script:
+        - COMPOSER_MEMORY_LIMIT=-1 /usr/local/bin/composer.phar config repositories.composer composer $TEST_PACKAGE_URL --working-dir=/htdocs/
+        - COMPOSER_MEMORY_LIMIT=-1 /usr/local/bin/composer.phar config repositories.testproject vcs $TEST_PROJECT_URL --working-dir=/htdocs/
+        - COMPOSER_MEMORY_LIMIT=-1 /usr/local/bin/composer.phar require $PROJECT_NAME:dev-$CI_COMMIT_REF_NAME --working-dir=/htdocs/
+    script:
+        - cd /htdocs/vendor/$PROJECT_NAME/
+        - ./build/runtests.sh
+    coverage: '/Methods: \d+\.\d+/'
+
+test_cto5.5_php8.4:
+    stage: test_cto5.5
+    rules:
+        -   if: $CI_COMMIT_BRANCH == "main"
+            when: on_success
+        -   if: $CI_COMMIT_BRANCH == "nightly"
+            when: on_success
+        -   if: $CI_COMMIT_BRANCH == "dev"
+            when: on_success
+        -   if: $CI_PIPELINE_SOURCE == "merge_request_event"
+            when: on_success
+        -   if: $CI_BUILD_TAG
+            when: never
+        -   if: $CI_COMMIT_BRANCH == "/dev-*/"
+            when: never
+    image: registry.netgroup.de/testsuite_cto5.5_php8.4:2.0.0
+    before_script:
+        - COMPOSER_MEMORY_LIMIT=-1 /usr/local/bin/composer.phar config repositories.composer composer $TEST_PACKAGE_URL --working-dir=/htdocs/
+        - COMPOSER_MEMORY_LIMIT=-1 /usr/local/bin/composer.phar config repositories.testproject vcs $TEST_PROJECT_URL --working-dir=/htdocs/
+        - COMPOSER_MEMORY_LIMIT=-1 /usr/local/bin/composer.phar require $PROJECT_NAME:dev-$CI_COMMIT_REF_NAME --working-dir=/htdocs/
+    script:
+        - cd /htdocs/vendor/$PROJECT_NAME/
+        - ./build/runtests.sh
+    coverage: '/Methods: \d+\.\d+/'
+
+test_cto5.5_php8.5:
+    stage: test_cto5.5
+    rules:
+        -   if: $CI_COMMIT_BRANCH == "main"
+            when: on_success
+        -   if: $CI_COMMIT_BRANCH == "nightly"
+            when: on_success
+        -   if: $CI_COMMIT_BRANCH == "dev"
+            when: on_success
+        -   if: $CI_PIPELINE_SOURCE == "merge_request_event"
+            when: on_success
+        -   if: $CI_BUILD_TAG
+            when: never
+        -   if: $CI_COMMIT_BRANCH == "/dev-*/"
+            when: never
+    image: registry.netgroup.de/testsuite_cto5.5_php8.5:2.0.0
+    before_script:
+        - COMPOSER_MEMORY_LIMIT=-1 /usr/local/bin/composer.phar config repositories.composer composer $TEST_PACKAGE_URL --working-dir=/htdocs/
+        - COMPOSER_MEMORY_LIMIT=-1 /usr/local/bin/composer.phar config repositories.testproject vcs $TEST_PROJECT_URL --working-dir=/htdocs/
+        - COMPOSER_MEMORY_LIMIT=-1 /usr/local/bin/composer.phar require $PROJECT_NAME:dev-$CI_COMMIT_REF_NAME --working-dir=/htdocs/
+    script:
+        - cd /htdocs/vendor/$PROJECT_NAME/
+        - ./build/runtests.sh
+    coverage: '/Methods: \d+\.\d+/'
+
+
+test_cto5.6_php8.3:
+    stage: test_cto5.6
+    rules:
+        -   if: $CI_COMMIT_BRANCH == "main"
+            when: on_success
+        -   if: $CI_COMMIT_BRANCH == "nightly"
+            when: on_success
+        -   if: $CI_COMMIT_BRANCH == "dev"
+            when: on_success
+        -   if: $CI_PIPELINE_SOURCE == "merge_request_event"
+            when: on_success
+        -   if: $CI_BUILD_TAG
+            when: never
+        -   if: $CI_COMMIT_BRANCH == "/dev-*/"
+            when: never
+    image: registry.netgroup.de/testsuite_cto5.6_php8.3:2.0.0
+    before_script:
+        - COMPOSER_MEMORY_LIMIT=-1 /usr/local/bin/composer.phar config repositories.composer composer $TEST_PACKAGE_URL --working-dir=/htdocs/
+        - COMPOSER_MEMORY_LIMIT=-1 /usr/local/bin/composer.phar config repositories.testproject vcs $TEST_PROJECT_URL --working-dir=/htdocs/
+        - COMPOSER_MEMORY_LIMIT=-1 /usr/local/bin/composer.phar require $PROJECT_NAME:dev-$CI_COMMIT_REF_NAME --working-dir=/htdocs/
+    script:
+        - cd /htdocs/vendor/$PROJECT_NAME/
+        - ./build/runtests.sh
+    coverage: '/Methods: \d+\.\d+/'
+
+test_cto5.6_php8.4:
+    stage: test_cto5.6
+    rules:
+        -   if: $CI_COMMIT_BRANCH == "main"
+            when: on_success
+        -   if: $CI_COMMIT_BRANCH == "nightly"
+            when: on_success
+        -   if: $CI_COMMIT_BRANCH == "dev"
+            when: on_success
+        -   if: $CI_PIPELINE_SOURCE == "merge_request_event"
+            when: on_success
+        -   if: $CI_BUILD_TAG
+            when: never
+        -   if: $CI_COMMIT_BRANCH == "/dev-*/"
+            when: never
+    image: registry.netgroup.de/testsuite_cto5.6_php8.4:2.0.0
+    before_script:
+        - COMPOSER_MEMORY_LIMIT=-1 /usr/local/bin/composer.phar config repositories.composer composer $TEST_PACKAGE_URL --working-dir=/htdocs/
+        - COMPOSER_MEMORY_LIMIT=-1 /usr/local/bin/composer.phar config repositories.testproject vcs $TEST_PROJECT_URL --working-dir=/htdocs/
+        - COMPOSER_MEMORY_LIMIT=-1 /usr/local/bin/composer.phar require $PROJECT_NAME:dev-$CI_COMMIT_REF_NAME --working-dir=/htdocs/
+    script:
+        - cd /htdocs/vendor/$PROJECT_NAME/
+        - ./build/runtests.sh
+    coverage: '/Methods: \d+\.\d+/'
+
+test_cto5.6_php8.5:
+    stage: test_cto5.6
+    rules:
+        -   if: $CI_COMMIT_BRANCH == "main"
+            when: on_success
+        -   if: $CI_COMMIT_BRANCH == "nightly"
+            when: on_success
+        -   if: $CI_COMMIT_BRANCH == "dev"
+            when: on_success
+        -   if: $CI_PIPELINE_SOURCE == "merge_request_event"
+            when: on_success
+        -   if: $CI_BUILD_TAG
+            when: never
+        -   if: $CI_COMMIT_BRANCH == "/dev-*/"
+            when: never
+    image: registry.netgroup.de/testsuite_cto5.6_php8.5:2.0.0
+    before_script:
+        - COMPOSER_MEMORY_LIMIT=-1 /usr/local/bin/composer.phar config repositories.composer composer $TEST_PACKAGE_URL --working-dir=/htdocs/
+        - COMPOSER_MEMORY_LIMIT=-1 /usr/local/bin/composer.phar config repositories.testproject vcs $TEST_PROJECT_URL --working-dir=/htdocs/
+        - COMPOSER_MEMORY_LIMIT=-1 /usr/local/bin/composer.phar require $PROJECT_NAME:dev-$CI_COMMIT_REF_NAME --working-dir=/htdocs/
+    script:
+        - cd /htdocs/vendor/$PROJECT_NAME/
+        - ./build/runtests.sh
+    coverage: '/Methods: \d+\.\d+/'
+
+
+test_cto5.7_php8.3:
+    stage: test_cto5.7
+    rules:
+        -   if: $CI_COMMIT_BRANCH == "main"
+            when: on_success
+        -   if: $CI_COMMIT_BRANCH == "nightly"
+            when: on_success
+        -   if: $CI_COMMIT_BRANCH == "dev"
+            when: on_success
+        -   if: $CI_PIPELINE_SOURCE == "merge_request_event"
+            when: on_success
+        -   if: $CI_BUILD_TAG
+            when: never
+        -   if: $CI_COMMIT_BRANCH == "/dev-*/"
+            when: never
+    image: registry.netgroup.de/testsuite_cto5.7_php8.3:2.0.0
+    before_script:
+        - COMPOSER_MEMORY_LIMIT=-1 /usr/local/bin/composer.phar config repositories.composer composer $TEST_PACKAGE_URL --working-dir=/htdocs/
+        - COMPOSER_MEMORY_LIMIT=-1 /usr/local/bin/composer.phar config repositories.testproject vcs $TEST_PROJECT_URL --working-dir=/htdocs/
+        - COMPOSER_MEMORY_LIMIT=-1 /usr/local/bin/composer.phar require $PROJECT_NAME:dev-$CI_COMMIT_REF_NAME --working-dir=/htdocs/
+    script:
+        - cd /htdocs/vendor/$PROJECT_NAME/
+        - ./build/runtests.sh
+    coverage: '/Methods: \d+\.\d+/'
+
+test_cto5.7_php8.4:
+    stage: test_cto5.7
+    rules:
+        -   if: $CI_COMMIT_BRANCH == "main"
+            when: on_success
+        -   if: $CI_COMMIT_BRANCH == "nightly"
+            when: on_success
+        -   if: $CI_COMMIT_BRANCH == "dev"
+            when: on_success
+        -   if: $CI_PIPELINE_SOURCE == "merge_request_event"
+            when: on_success
+        -   if: $CI_BUILD_TAG
+            when: never
+        -   if: $CI_COMMIT_BRANCH == "/dev-*/"
+            when: never
+    image: registry.netgroup.de/testsuite_cto5.7_php8.4:2.0.0
+    before_script:
+        - COMPOSER_MEMORY_LIMIT=-1 /usr/local/bin/composer.phar config repositories.composer composer $TEST_PACKAGE_URL --working-dir=/htdocs/
+        - COMPOSER_MEMORY_LIMIT=-1 /usr/local/bin/composer.phar config repositories.testproject vcs $TEST_PROJECT_URL --working-dir=/htdocs/
+        - COMPOSER_MEMORY_LIMIT=-1 /usr/local/bin/composer.phar require $PROJECT_NAME:dev-$CI_COMMIT_REF_NAME --working-dir=/htdocs/
+    script:
+        - cd /htdocs/vendor/$PROJECT_NAME/
+        - ./build/runtests.sh
+    coverage: '/Methods: \d+\.\d+/'
+
+test_cto5.7_php8.5:
+    stage: test_cto5.7
+    rules:
+        -   if: $CI_COMMIT_BRANCH == "main"
+            when: on_success
+        -   if: $CI_COMMIT_BRANCH == "nightly"
+            when: on_success
+        -   if: $CI_COMMIT_BRANCH == "dev"
+            when: on_success
+        -   if: $CI_PIPELINE_SOURCE == "merge_request_event"
+            when: on_success
+        -   if: $CI_BUILD_TAG
+            when: never
+        -   if: $CI_COMMIT_BRANCH == "/dev-*/"
+            when: never
+    image: registry.netgroup.de/testsuite_cto5.7_php8.5:2.0.0
+    before_script:
+        - COMPOSER_MEMORY_LIMIT=-1 /usr/local/bin/composer.phar config repositories.composer composer $TEST_PACKAGE_URL --working-dir=/htdocs/
+        - COMPOSER_MEMORY_LIMIT=-1 /usr/local/bin/composer.phar config repositories.testproject vcs $TEST_PROJECT_URL --working-dir=/htdocs/
+        - COMPOSER_MEMORY_LIMIT=-1 /usr/local/bin/composer.phar require $PROJECT_NAME:dev-$CI_COMMIT_REF_NAME --working-dir=/htdocs/
+    script:
+        - cd /htdocs/vendor/$PROJECT_NAME/
+        - ./build/runtests.sh
+    coverage: '/Methods: \d+\.\d+/'
