@@ -4,7 +4,7 @@
 ![PHP](https://img.shields.io/badge/PHP-%5E8.3-777bb4.svg)
 ![Contao](https://img.shields.io/badge/Contao-%5E5.3-ea5d0b.svg)
 
-Eine schlanke **Data Transformation Layer** für Contao-Bundles: Du definierst **Projections** (ausgabespezifische Feld-Transformationen) und wendest sie effizient auf große Datenmengen0 an – inklusive **Prefetching**, um N+1-Queries zu vermeiden. Neben der Transformation bestehender Felder können auch **neue berechnete Felder hinzugefügt** und **bestehende Felder entfernt** werden.
+Eine schlanke **Data Transformation Layer** für Contao-Bundles: Du definierst **Projections** (ausgabespezifische Feld-Transformationen) und wendest sie effizient auf große Datenmengen an – inklusive **Prefetching**, um N+1-Queries zu vermeiden. Neben der Transformation bestehender Felder können auch **neue berechnete Felder hinzugefügt** und **bestehende Felder entfernt** werden.
 
 ---
 
