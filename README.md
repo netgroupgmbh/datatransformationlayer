@@ -292,10 +292,10 @@ use Symfony\Component\HttpFoundation\Response;
 
 final class MemberController extends AbstractController
 {
-    public function __construct(
-        private readonly Connection $connection,
-        private readonly DatasetTransformer $transformer,
-    ) {}
+
+    public function __construct(private readonly TransforamtionHelper $helper)
+    {
+    }
 
     public function list(): Response
     {
@@ -308,12 +308,7 @@ final class MemberController extends AbstractController
             ->fetchAllAssociative()
         ;
 
-        $context = new ConversionContext(
-            projection: 'member_list',
-            options: ['timezone' => 'Europe/Berlin']
-        );
-
-        $rows = $this->transformer->transform($rows, $context);
+        $rows = $this->helper->transform('member_list', $rows, ['timezone' => 'Europe/Berlin']);
 
         return $this->render('member/list.html.twig', [
             'rows' => $rows,
