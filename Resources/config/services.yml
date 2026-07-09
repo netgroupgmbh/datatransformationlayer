@@ -14,3 +14,6 @@ services:
 
     # Factories
     NetGroup\DataTransformationLayer\Classes\Services\Factories\DefinitionFactory: ~
+
+    # Helper
+    NetGroup\DataTransformationLayer\Classes\Services\Helper\TransforamtionHelper: ~
