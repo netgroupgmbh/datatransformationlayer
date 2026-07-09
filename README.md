@@ -284,8 +284,7 @@ In deinem Controller/Service lädst du Daten per DBAL und transformierst sie mit
 
 namespace App\Controller;
 
-use App\Conversion\DatasetTransformer;
-use App\Conversion\Definition\ConversionContext;
+use NetGroup\DataTransformationLayer\Classes\Services\Helper\TransforamtionHelper;
 use Doctrine\DBAL\Connection;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -293,7 +292,7 @@ use Symfony\Component\HttpFoundation\Response;
 final class MemberController extends AbstractController
 {
 
-    public function __construct(private readonly TransforamtionHelper $helper)
+    public function __construct(private readonly Connection $connection, private readonly TransforamtionHelper $helper)
     {
     }
 

@@ -12,7 +12,7 @@
 
 declare(strict_types=1);
 
-namespace NetGroup\DataTransformationLayer\Classes\Services;
+namespace NetGroup\DataTransformationLayer\Classes\Services\Helper;
 
 use NetGroup\DataTransformationLayer\Classes\Engine\DatasetTransformer;
 use NetGroup\DataTransformationLayer\Classes\Services\Factories\DefinitionFactory;
@@ -22,7 +22,7 @@ class TransforamtionHelper
 
 
     /**
-     * @param DefinitionFactory $factory
+     * @param DefinitionFactory  $factory
      * @param DatasetTransformer $transformer
      */
     public function __construct(
@@ -33,11 +33,11 @@ class TransforamtionHelper
 
 
     /**
-     * @param string $projectionName
-     * @param array $rows
-     * @param array $options
+     * @param string                           $projectionName
+     * @param array<int, array<string, mixed>> $rows
+     * @param mixed[]                          $options
      *
-     * @return array
+     * @return array<int, array<string, mixed>>
      *
      * @throws \JsonException
      */
