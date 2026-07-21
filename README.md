@@ -412,7 +412,7 @@ $builder->addField('zielfeld_name')
         ->compute(ConverterClass::class, $params, 'optionales_quellfeld');
 ```
 
-- **`addField($targetField)`** – gibt einen `FieldAdditionBuilder` zurück
+- **`addField($targetField)`** - gibt einen `FieldAdditionBuilder` zurück
 - **`compute($converterClass, $params, $sourceField)`** – definiert den Converter, der den Wert für das neue Feld berechnet
   - `$converterClass` – FQCN eines `FieldConverterInterface`
   - `$params` – Converter-Parameter (optional, Standard: `[]`)
