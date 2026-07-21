@@ -11,3 +11,4 @@ autoload*
 vendor/
 .idea/
 build/rulesets.xml
+composer.lock

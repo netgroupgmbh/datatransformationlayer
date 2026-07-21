@@ -549,7 +549,7 @@ final class OrderExportProjection implements ProjectionInterface
 Der `DatasetTransformer` führt die drei Operationstypen in einer festen Reihenfolge aus:
 
 1. **Add** – Neue berechnete Felder hinzufügen (Additions)
-2**Convert** – Bestehende Felder transformieren (Wert-Pipeline)
+2. **Convert** – Bestehende Felder transformieren (Wert-Pipeline)
 3. **Remove** – Felder aus dem Output entfernen (Removals)
 
 Diese Reihenfolge stellt sicher, dass:
