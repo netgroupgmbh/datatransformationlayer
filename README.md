@@ -558,6 +558,52 @@ Diese Reihenfolge stellt sicher, dass:
 
 ---
 
+## Helper
+
+### ArrayColumnSorter
+
+Für das Sortieren der Spalten der Ergbenissmenge steht der `ArrayColumnSorter` zur Vefügung. Er erhält das Array mit den konvertierten Daten,
+sowie ein Array mit den Spaltennamen in der Reiehnfolgen, in der das Datenarray sorteirt werden soll.
+
+```php
+<?php
+
+namespace App\Conversion\Projection;
+
+use NetGroup\DataTransformationLayer\Classes\Services\Helper\ArrayColumnSorter;
+
+final class MyClass
+{
+
+    public function __construct(private readonly ArrayColumnSorter $sorter)
+    {
+    }
+
+    public function doSomething(): array
+    {
+        $rows = [
+            ['description' => 'Nur ein Test', 'title' => 'Test 001', 'id' => 12],
+            ['description' => 'Nur noch ein Test', 'title' => 'Test 002', 'id' => 34]
+        ];
+
+        $order = ['id', 'title', 'description'];
+
+        return $this->sorter->sort($rows, $order;
+    }
+}
+```
+
+Die Methode gibt das folgende Array zurück:
+
+```php
+[
+    ['id' => 12, 'title' => 'Test 001', 'description' => 'Nur ein Test'],
+    ['id' => 34, 'title' => 'Test 002', 'description' => 'Nur noch ein Test']
+]
+```
+
+---
+
 ## Fehler- & Null-Policy
 
 Damit Ausgaben stabil und vorhersehbar sind, sollte im Projekt eine klare Policy gelten. Dieses Paket ist bewusst flexibel; du solltest dich aber **explizit** für ein Verhalten entscheiden.
