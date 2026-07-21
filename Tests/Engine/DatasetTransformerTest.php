@@ -878,8 +878,7 @@ class DatasetTransformerTest extends TestCase
 
 
     /**
-     * Testet, dass Additions auf bereits konvertierte Werte zugreifen koennen,
-     * da Convert vor Add ausgefuehrt wird.
+     * Testet, dass Additions auf Originalwerte zugreifen, da Additions vor Convert ausgefuehrt werden.
      */
     public function testAdditionCanAccessConvertedValues(): void
     {
@@ -898,11 +897,13 @@ class DatasetTransformerTest extends TestCase
             ->method('convert')
             ->willReturnCallback(static fn (mixed $value): int => (int) $value * 2);
 
-        // Der FormatConverter erhaelt den bereits konvertierten Wert (200),
-        // da er nach dem Convert ausgefuehrt wird.
+        // Der FormatConverter erhaelt den Originalwert (100),
+        // da Additions vor Convert ausgefuehrt werden.
         $formatConverter = $this->getMockBuilder(FieldConverterInterface::class)->getMock();
         $formatConverter
+            ->expects($this->once())
             ->method('convert')
+            ->with(100)
             ->willReturnCallback(static fn (mixed $value): string => $value . ' EUR');
 
         $this->registryMock
@@ -921,8 +922,8 @@ class DatasetTransformerTest extends TestCase
 
         // Assert – Convert wurde ausgefuehrt
         $this->assertSame(200, $result[0]['price']);
-        // Assert – Addition hat den konvertierten Wert erhalten
-        $this->assertSame('200 EUR', $result[0]['formatted']);
+        // Assert – Addition hat den Originalwert erhalten (da Additions vor Convert ausgefuehrt werden)
+        $this->assertSame('100 EUR', $result[0]['formatted']);
     }
 
 

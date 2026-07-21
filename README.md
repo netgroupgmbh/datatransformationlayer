@@ -454,7 +454,7 @@ $builder->addField('display_label')
         ->compute(TruncateConverter::class, ['maxLength' => 50]);
 ```
 
-> **Hinweis:** Additions werden *nach* den regulären Feld-Konvertierungen ausgeführt. Dadurch haben Addition-Converter Zugriff auf bereits konvertierte Feldwerte in `$row`.
+> **Hinweis:** Additions werden *vor* den regulären Feld-Konvertierungen ausgeführt. Dadurch haben Addition-Converter Zugriff auf die original Feldwerte in `$row`. Werte wie Ids stehen also für das Hinzufügen noch zur Verfügung.
 
 ---
 
@@ -490,7 +490,7 @@ public function build(ProjectionPlanBuilder $builder): void
 }
 ```
 
-> **Hinweis:** Removals werden *nach* den Additions ausgeführt. Dadurch kann ein Feld zunächst als Quellwert für eine Addition dienen und anschließend entfernt werden.
+> **Hinweis:** Removals werden *nach* den Additions und den regulären Feld-Konvertierungen ausgeführt. Dadurch kann ein Feld zunächst als Quellwert für eine Addition oder Konvertierung dienen und anschließend entfernt werden.
 
 ---
 
@@ -517,15 +517,15 @@ final class OrderExportProjection implements ProjectionInterface
 
     public function build(ProjectionPlanBuilder $builder): void
     {
-        // 1) Bestehendes Feld transformieren
-        $builder->field('created_at')
-                ->convert(DateTimeFormatConverter::class, ['format' => 'd.m.Y']);
-
-        // 2) Neues berechnetes Feld hinzufügen
+        // 1) Neues berechnetes Feld hinzufügen
         $builder->addField('total_price')
                 ->compute(MultiplyFieldsConverter::class, [
                     'fields' => ['quantity', 'unit_price'],
                 ]);
+
+        // 2) Bestehendes Feld transformieren
+        $builder->field('created_at')
+                ->convert(DateTimeFormatConverter::class, ['format' => 'd.m.Y']);
 
         // 3) Originalfelder nach Berechnung entfernen
         $builder->removeField('quantity');
@@ -548,12 +548,12 @@ final class OrderExportProjection implements ProjectionInterface
 
 Der `DatasetTransformer` führt die drei Operationstypen in einer festen Reihenfolge aus:
 
-1. **Convert** – Bestehende Felder transformieren (Wert-Pipeline)
-2. **Add** – Neue berechnete Felder hinzufügen (Additions)
+1. **Add** – Neue berechnete Felder hinzufügen (Additions)
+2**Convert** – Bestehende Felder transformieren (Wert-Pipeline)
 3. **Remove** – Felder aus dem Output entfernen (Removals)
 
 Diese Reihenfolge stellt sicher, dass:
-- Additions auf bereits konvertierte Werte zugreifen können
+- Additions auf Originalwerte zugreifen können
 - Removals erst am Ende greifen, sodass Felder sowohl als Quellwert für Additions als auch für Convert-Pipelines dienen können
 
 ---

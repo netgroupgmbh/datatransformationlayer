@@ -56,9 +56,7 @@ class TransforamtionHelperTest extends TestCase
                                    ->disableOriginalConstructor()
                                    ->getMock();
 
-        $this->context      = $this->getMockBuilder(ConversionContext::class)
-                                   ->disableOriginalConstructor()
-                                   ->getMock();
+        $this->context      = $this->createStub(ConversionContext::class);
 
         $this->helper = new TransforamtionHelper($this->factory, $this->transformer);
     }

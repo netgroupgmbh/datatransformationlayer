@@ -90,19 +90,7 @@ class DatasetTransformer
 
         // 2) Pro Row konvertieren
         foreach ($rows as $i => $row) {
-            // 2a) Bestehende Felder konvertieren (wie bisher)
-            foreach ($plan->stepsByField() as $field => $steps) {
-                $value = $row[$field] ?? null;
-
-                foreach ($steps as $step) {
-                    $converter  = $this->getConverter($step->converterClass);
-                    $value      = $converter->convert($value, $row, $context, $step->params);
-                }
-
-                $row[$field] = $value;
-            }
-
-            // 2b) Neue Felder hinzufuegen
+            // 2a) Neue Felder hinzufuegen
             foreach ($plan->additions() as $addition) {
                 $sourceValue = ('' !== $addition->sourceField)
                     ? ($row[$addition->sourceField] ?? null)
@@ -115,6 +103,18 @@ class DatasetTransformer
                     $context,
                     $addition->params,
                 );
+            }
+
+            // 2b) Bestehende Felder konvertieren (wie bisher)
+            foreach ($plan->stepsByField() as $field => $steps) {
+                $value = $row[$field] ?? null;
+
+                foreach ($steps as $step) {
+                    $converter  = $this->getConverter($step->converterClass);
+                    $value      = $converter->convert($value, $row, $context, $step->params);
+                }
+
+                $row[$field] = $value;
             }
 
             // 2c) Felder entfernen
